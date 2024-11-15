@@ -22,8 +22,8 @@ const formSchema = z.object({
     .min(3, {
       message: "Username must be at least 3 characters.",
     })
-    .max(16, {
-      message: "Username must be at most 16 characters.",
+    .max(10, {
+      message: "Username must be at most 10 characters.",
     })
     .regex(/^[a-zA-Z0-9_]+$/, {
       message: "Username's can only contain letters, numbers, and underscores.",
@@ -40,7 +40,6 @@ const LoginForm: React.FC = () => {
     },
   });
 
-  // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
     const { username } = values;
 

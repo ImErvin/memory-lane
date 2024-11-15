@@ -1,11 +1,10 @@
 "use client";
 
 import { type AppRouter } from "@/server/api/root";
-import { api } from "@/trpc/react";
 import { type inferProcedureOutput } from "@trpc/server";
 import React, { createContext, useContext, type ReactNode } from "react";
 
-type MemoryArray = inferProcedureOutput<AppRouter["memories"]["getAll"]>;
+type MemoryArray = inferProcedureOutput<AppRouter["memories"]["getOne"]>;
 
 interface UserMemoriesContextProps {
   orderBy: "asc" | "desc";
@@ -40,13 +39,13 @@ export const UserMemoriesProvider: React.FC<UserMemoriesProviderProps> = (
   const { children, username } = props;
   const [orderBy, setOrderBy] = React.useState<"asc" | "desc">("desc");
 
-  const { data: memories, isLoading } = api.memories.getAll.useQuery({
-    orderBy,
-    username,
-  });
+  // const { data: memories, isLoading } = api.memories.getAll.useQuery({
+  //   orderBy,
+  //   username,
+  // });
 
   return (
-    <UserMemoriesContext.Provider value={{ orderBy, setOrderBy, memories, username, isLoading }}>
+    <UserMemoriesContext.Provider value={{ orderBy, setOrderBy, memories: undefined, username, isLoading: false }}>
       {children}
     </UserMemoriesContext.Provider>
   );
