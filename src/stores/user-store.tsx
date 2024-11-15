@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface UserState {
-  user: { id: string; name: string } | null;
-  setUser: (user: { id: string; name: string }) => void;
+  username: string | null;
+  setUsername: (username: string) => void;
   clearUser: () => void;
   lastUpdated?: number;
 }
@@ -11,9 +11,10 @@ interface UserState {
 const useUserStore = create<UserState>()(
   persist(
     (set) => ({
-      user: null,
-      setUser: (user) => set({ user }),
-      clearUser: () => set({ user: null }),
+      username: null,
+      setUsername: (username) =>
+        set({ username, lastUpdated: new Date().getTime() }),
+      clearUser: () => set({ username: null, lastUpdated: 0 }),
     }),
     {
       name: "user-storage",
