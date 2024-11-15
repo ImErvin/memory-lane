@@ -5,6 +5,7 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { magilio } from "./fonts/fonts";
+import Header from "@/components/header";
 
 export const metadata: Metadata = {
   title: "Memory Lane",
@@ -18,7 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable} ${magilio.variable}`}>
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <Header />
+          {children}
+        </TRPCReactProvider>
       </body>
     </html>
   );
