@@ -1,10 +1,9 @@
 import "@/styles/globals.css";
 
-import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
-import { magilio } from "./fonts/fonts";
+import { magilio, pally } from "./fonts/fonts";
 import Header from "@/components/header/header";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -18,7 +17,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${magilio.variable}`}>
+    <html lang="en" className={`${pally.variable} ${magilio.variable}`}>
       <body>
         <TRPCReactProvider>
           <Header />

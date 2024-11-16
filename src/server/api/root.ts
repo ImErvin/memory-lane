@@ -1,5 +1,6 @@
 import { memoriesRouter } from "@/server/api/routers/memories";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
+import { lanesRouter } from "./routers/lanes";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   memories: memoriesRouter,
+  lanes: lanesRouter,
 });
 
 // export type definition of API

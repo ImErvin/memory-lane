@@ -1,3 +1,4 @@
+import { animated } from "@react-spring/web";
 import Avatar from "boring-avatars";
 import type { AvatarProps } from "boring-avatars";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -29,6 +30,9 @@ const avatarStyles = cva("", {
       sm: 16,
       md: 24,
       lg: 32,
+      xl: 40,
+      xxl: 64,
+      custom: 0,
     },
   },
   defaultVariants: {
@@ -36,17 +40,36 @@ const avatarStyles = cva("", {
   },
 });
 
-interface BoringAvatarProps
+type BoringAvatarVariantProps = VariantProps<typeof avatarStyles>;
+
+interface BoringAvatarBaseProps
   extends Omit<AvatarProps, "colors" | "variant" | "size">,
-    VariantProps<typeof avatarStyles> {}
+    BoringAvatarVariantProps,
+    React.SVGAttributes<SVGElement> {}
+
+interface CustomSizeRequiredProps extends BoringAvatarBaseProps {
+  size: "custom";
+  customSize: number;
+}
+
+interface StandardSizeProps extends BoringAvatarBaseProps {
+  size: Exclude<BoringAvatarVariantProps["size"], "custom">;
+  customSize?: number;
+}
+
+type BoringAvatarProps = StandardSizeProps | CustomSizeRequiredProps;
 
 const BoringAvatar: React.FC<BoringAvatarProps> = (props) => {
-  const { size = "md", ...rest } = props;
-  const computedSize = avatarStyles({ size });
+  const { size = "md", customSize, ...rest } = props;
+
+  const computedSize =
+    size === "custom" && customSize ? customSize : avatarStyles({ size });
 
   return (
-    <Avatar {...rest} colors={COLORS} variant="beam" size={computedSize} />
+    <Avatar {...rest} colors={COLORS} variant="beam" size={computedSize ?? 0} />
   );
 };
+
+export const AnimatedBoringAvatar = animated(BoringAvatar);
 
 export default BoringAvatar;

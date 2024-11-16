@@ -9,15 +9,29 @@ import {
 } from "../ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Link from "next/link";
+import { useState } from "react";
+
+const AUTHENTICATED_PATHS = (username: string) => [
+  {
+    name: "Profile",
+    href: `/users/${username}`,
+  },
+];
 
 export const ProfileAction: React.FC = () => {
   const { username, clearUser: signout } = useUserStore();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  // Dont expect to hit this state as ProfileAction should only be rendered when username is present
+  if (!username) {
+    return null;
+  }
 
   return (
-    <Popover>
+    <Popover onOpenChange={setIsPopoverOpen} open={isPopoverOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant={"outline"}
+          variant={"secondary"}
           size={"lg"}
           className="flex max-w-48 gap-6 pl-3"
         >
@@ -42,21 +56,25 @@ export const ProfileAction: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="px-1 pb-1 pt-1">
-          <Link href={`/memories/${username}`}>
-            <Button
-              variant={"ghost"}
-              size={"sm"}
-              className="w-full justify-start"
-            >
-              Memories
-            </Button>
-          </Link>
+          {username &&
+            AUTHENTICATED_PATHS(username).map((path) => (
+              <Link key={path.href} href={path.href}>
+                <Button
+                  variant={"ghost"}
+                  size={"lg"}
+                  className="w-full justify-start"
+                  onClick={() => setIsPopoverOpen(false)}
+                >
+                  {path.name}
+                </Button>
+              </Link>
+            ))}
         </CardContent>
         <CardFooter className="border-t p-1">
           <Button
             variant={"ghost"}
             onClick={signout}
-            size={"sm"}
+            size={"lg"}
             className="w-full justify-start"
           >
             Sign out

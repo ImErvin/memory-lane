@@ -7,7 +7,7 @@ export default {
   theme: {
   	extend: {
   		fontFamily: {
-  			sans: ["var(--font-geist-sans)", ...fontFamily.sans],
+  			sans: ["var(--font-pally)", ...fontFamily.sans],
   			magilio: ["var(--magilio)", ...fontFamily.sans]
   		},
   		borderRadius: {

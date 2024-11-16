@@ -1,6 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { animated } from "@react-spring/web"
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -9,7 +10,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border bg-card text-card-foreground shadow",
+      "rounded-xl border bg-card text-card-foreground",
       className
     )}
     {...props}
@@ -73,4 +74,11 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+const AnimatedCard = animated(Card);
+const AnimatedCardHeader = animated(CardHeader);
+const AnimatedCardTitle = animated(CardTitle);
+const AnimatedCardDescription = animated(CardDescription);
+const AnimatedCardContent = animated(CardContent);
+const AnimatedCardFooter = animated(CardFooter);
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, AnimatedCard, AnimatedCardHeader, AnimatedCardTitle, AnimatedCardDescription, AnimatedCardContent, AnimatedCardFooter }
