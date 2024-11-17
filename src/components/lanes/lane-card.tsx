@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -16,8 +15,6 @@ import {
   useIsomorphicLayoutEffect,
   useSpring,
 } from "@react-spring/web";
-import { useEffect, useState } from "react";
-import Marquee from "react-fast-marquee";
 
 interface LaneCardProps {
   id: number;
@@ -36,7 +33,7 @@ const LaneCard: React.FC<LaneCardProps> = (props) => {
 
   // Not sure why some parts of the app dont need to use useIsomorphicLayoutEffect to play animations
   useIsomorphicLayoutEffect(() => {
-    fadeInSpringApi.start({
+    void fadeInSpringApi.start({
       from: {
         opacity: 0,
       },
