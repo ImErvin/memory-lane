@@ -9,10 +9,7 @@ const memoryInputSchema = z.object({
   timestamp: z.string().optional(),
   laneId: z.number(),
   creator: z.string(),
-  images: z
-    .array(z.string().url())
-    .min(1, "At least one image URL is required")
-    .max(1, "Maximum of 1 image URLs allowed"),
+  imageUrl: z.string().url().min(1, "Image URL is required"),
 });
 
 const memoryUpdateSchema = z.object({
@@ -21,7 +18,7 @@ const memoryUpdateSchema = z.object({
   description: z.string().optional(),
   timestamp: z.string().optional(),
   creator: z.string(),
-  images: z.array(z.string().url()).optional(),
+  imageUrl: z.string().url().optional(),
 });
 
 export const memoriesRouter = createTRPCRouter({
@@ -51,17 +48,7 @@ export const memoriesRouter = createTRPCRouter({
           description: input.description,
           timestamp: input.timestamp ? new Date(input.timestamp) : undefined,
           laneId: input.laneId,
-          images: {
-            // Currently only allowing 1 image upload on the FE and zod
-            // but can be extended to allow multiple images later
-            create: input.images.map((url) => ({
-              url,
-              uploader: input.creator,
-            })),
-          },
-        },
-        include: {
-          images: true,
+          imageUrl: input.imageUrl,
         },
       });
 
@@ -72,7 +59,6 @@ export const memoriesRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.number(),
-        creator: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -81,7 +67,6 @@ export const memoriesRouter = createTRPCRouter({
       const memory = await ctx.db.memory.findUnique({
         where: { id: input.id },
         include: {
-          images: true,
           lane: {
             select: {
               creator: true,
@@ -131,18 +116,7 @@ export const memoriesRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           timestamp: input.timestamp ? new Date(input.timestamp) : undefined,
-          images: input.images
-            ? {
-                deleteMany: {},
-                create: input.images.map((url) => ({
-                  url,
-                  uploader: input.creator,
-                })),
-              }
-            : undefined,
-        },
-        include: {
-          images: true,
+          imageUrl: input.imageUrl,
         },
       });
 
@@ -200,9 +174,6 @@ export const memoriesRouter = createTRPCRouter({
         where: { laneId: input.laneId },
         orderBy: {
           timestamp: input.orderBy ?? "desc",
-        },
-        include: {
-          images: true,
         },
       });
 

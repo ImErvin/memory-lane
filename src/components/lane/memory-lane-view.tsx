@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { CreateMemoryFormDialog } from "../memories/memories-form-dialog";
 import MemoriesGrid from "../memories/memories-grid";
 import useUserStore from "@/stores/user-store";
+import { ScrollArea } from "../ui/scroll-area";
 
 const EmptyState = () => {
   const { username } = useUserStore();
@@ -55,7 +56,7 @@ const MemoryLane: React.FC = () => {
 
   // Not sure why some parts of the app dont need to use useIsomorphicLayoutEffect to play animations
   useIsomorphicLayoutEffect(() => {
-    fadeInSpringApi.start({
+    void fadeInSpringApi.start({
       from: {
         opacity: 0,
       },
@@ -74,17 +75,13 @@ const MemoryLane: React.FC = () => {
       className="flex h-full min-h-screen w-full flex-col"
       style={fadeInSpring}
     >
-      {/* <ScrollArea> */}
-      <div className="z-0 flex h-full w-full pt-[calc(72px+8px+16px)]">
-        <MemoryLanePlaque />
-      </div>
-      {memories.length === 0 && <EmptyState />}
-      {memories.length !== 0 && (
-        <div className="h-full bg-gradient-to-t from-white via-white to-transparent" />
-      )}
-      {memories.length !== 0 && <MemoriesGrid />}
-
-      {/* </ScrollArea> */}
+      <ScrollArea>
+        <div className="z-0 flex h-auto w-full pt-[calc(72px+8px+16px)]">
+          <MemoryLanePlaque />
+        </div>
+        {memories.length === 0 && <EmptyState />}
+        {memories.length !== 0 && <MemoriesGrid />}
+      </ScrollArea>
     </animated.main>
   );
 };

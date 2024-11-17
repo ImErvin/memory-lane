@@ -1,52 +1,97 @@
 import { useMemoryLane } from "@/contexts/use-memory-lane";
-import { animated, useScroll } from "@react-spring/web";
+import {
+  animated,
+  config,
+  useInView,
+  useScroll,
+  useSpring,
+} from "@react-spring/web";
 import { useEffect, useMemo } from "react";
 import { AspectRatio } from "../ui/aspect-ratio";
-import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import Image from "next/image";
+import { format } from "date-fns/format";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 interface MemoryViewProps {
   id: number;
   name: string;
   description?: string | null;
   timestamp: Date;
-  pageNumber: number;
+  imageUrl: string;
 }
 
 const MemoryView: React.FC<MemoryViewProps> = (props) => {
-  const { memories } = useMemoryLane();
+  const [ref, inView] = useInView({
+    amount: 0.5,
+  });
 
+  const fadeInOutSpring = useSpring({
+    from: { opacity: 0, scale: 1, filter: "blur(40px)" },
+    to: {
+      opacity: inView ? 1 : 0,
+      scale: inView ? 1 : 1.1,
+      filter: "blur(20px)",
+    },
+    config: config.molasses,
+  });
   return (
-    <section className="relative flex h-screen flex-shrink-0 flex-col bg-white group">
-      <div className="mx-auto flex h-full w-full max-w-hd flex-col items-center justify-center px-4">
-        <img
-          src={`https://picsum.photos/${1200 + props.pageNumber}`}
-          alt={props.name}
-          className="z-10 h-full max-h-[80%] w-full max-w-full object-contain object-center"
+    <Card className="relative flex h-full flex-col items-center justify-center overflow-hidden rounded-3xl">
+      <animated.div className="absolute inset-0 z-0 h-full w-full flex-shrink-0 bg-cover bg-center">
+        <AnimatedImage
+          style={fadeInOutSpring}
+          src={props.imageUrl}
+          alt={"background image"}
+          layout="fill"
+          objectFit="cover"
         />
-
-        <Card className="z-10 mr-auto">
-          <CardHeader>
-            <CardTitle>{props.name}</CardTitle>
-            {props?.description && (
-              <CardDescription>{props.description}</CardDescription>
-            )}
-          </CardHeader>
-        </Card>
-        <div className="absolute inset-0 z-0 h-full w-full overflow-hidden group">
-          <img
-            src={`https://picsum.photos/${1200 + props.pageNumber}`}
-            alt={props.name}
-            className="z-0 h-full w-full object-cover object-center blur-lg"
-            style={{
-              // maskImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))`,
-            }}
-          />
-
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-black via-transparent to-black group-first:to-white"/>
-        </div>
+      </animated.div>
+      <div
+        ref={ref}
+        className="relative z-10 flex h-full max-h-[95%] min-h-[400px] w-full max-w-full items-center justify-center border-b object-center p-4"
+      >
+        <Image
+          src={props.imageUrl}
+          alt={props.name}
+          className="rounded-xl object-contain object-center"
+          width={400}
+          height={400}
+        />
       </div>
-    </section>
+      <div className="z-10 flex w-full flex-col bg-white pr-4">
+        <CardHeader className="w-full max-w-[360px]">
+          <CardTitle className="text-xl lg:text-3xl">{props.name}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {props?.description && (
+            <CardDescription className="w-full max-w-[360px]">
+              {props.description}
+            </CardDescription>
+          )}
+          <h3 className="text-sm text-gray-500">
+            {format(new Date(props.timestamp), "MMM dd, yyyy")}
+          </h3>
+        </CardContent>
+        <CardFooter>
+          <Link href={`/memories/${props.id}`}>
+            <Button variant="outline" size="sm">
+              View
+            </Button>
+          </Link>
+        </CardFooter>
+      </div>
+    </Card>
   );
 };
+
+const AnimatedImage = animated(Image);
 
 export default MemoryView;

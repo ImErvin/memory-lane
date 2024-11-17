@@ -50,8 +50,8 @@ const MemoryLanePlaque = () => {
               }
               laneId={lane.id}
               onSuccess={() => {
-                refetchLane();
-                refetchMemories();
+                void refetchLane();
+                void refetchMemories();
               }}
             />
 

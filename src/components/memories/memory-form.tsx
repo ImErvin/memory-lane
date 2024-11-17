@@ -172,10 +172,10 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
         ? new Date(values.timestamp).toISOString()
         : undefined,
       creator: username,
-      images: [imageUrl],
+      imageUrl,
     };
 
-    if (payload.id) {
+    if (props.id) {
       updateMemory(payload);
     } else {
       createMemory(payload);

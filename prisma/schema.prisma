@@ -29,17 +29,10 @@ model Memory {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt()
 
+  // Currently only supporting one image per memory
+  // I had an image model in the previous version of the schema but I removed it for simplicity
+  imageUrl String
+
   laneId Int
   lane   Lane @relation(fields: [laneId], references: [id], onDelete: Cascade)
-
-  images Image[]
-}
-
-model Image {
-  id        Int      @id @default(autoincrement())
-  url       String
-  uploader  String
-  createdAt DateTime @default(now())
-  memoryId  Int
-  memory    Memory   @relation(fields: [memoryId], references: [id], onDelete: Cascade)
 }
