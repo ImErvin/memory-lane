@@ -182,4 +182,26 @@ export const memoriesRouter = createTRPCRouter({
 
       return memory;
     }),
+
+  getAllForLane: publicProcedure
+    .input(
+      z.object({
+        laneId: z.number(),
+        orderBy: z.enum(["asc", "desc"]).optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.db.memory) throw new DbConnectionError();
+
+      const memories = await ctx.db.memory.findMany({
+        where: {
+          laneId: input.laneId,
+        },
+        orderBy: {
+          timestamp: input.orderBy || "desc",
+        },
+      });
+
+      return memories;
+    }),
 });

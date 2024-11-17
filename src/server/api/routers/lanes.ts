@@ -33,24 +33,26 @@ export const lanesRouter = createTRPCRouter({
       return lane;
     }),
 
-  getOne: publicProcedure.input(z.object({ id: z.number() })).query(async ({ ctx, input }) => {
-    if (!ctx.db.lane) throw new DbConnectionError();
+  getOne: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      if (!ctx.db.lane) throw new DbConnectionError();
 
-    const lane = await ctx.db.lane.findUnique({
-      where: {
-        id: input.id,
-      },
-    });
-
-    if (!lane) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "The lane you are trying to access does not exist",
+      const lane = await ctx.db.lane.findUnique({
+        where: {
+          id: input.id,
+        },
       });
-    }
 
-    return lane;
-  }),
+      if (!lane) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The lane you are trying to access does not exist",
+        });
+      }
+
+      return lane;
+    }),
 
   getAllForUsername: publicProcedure
     .input(z.object({ creator: z.string() }))
@@ -60,6 +62,13 @@ export const lanesRouter = createTRPCRouter({
       const lanes = await ctx.db.lane.findMany({
         where: {
           creator: input.creator,
+        },
+        include: {
+          _count: {
+            select: {
+              memories: true,
+            },
+          },
         },
       });
 
@@ -139,4 +148,29 @@ export const lanesRouter = createTRPCRouter({
 
       return deletedLane;
     }),
+
+  get10: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.db.lane) throw new DbConnectionError();
+
+    const lanes = await ctx.db.lane.findMany({
+      include: {
+        _count: {
+          select: {
+            memories: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      where: {
+        memories: {
+          some: {}
+        }
+      },
+      take: 10,
+    });
+
+    return lanes;
+  }),
 });

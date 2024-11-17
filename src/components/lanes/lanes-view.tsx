@@ -1,41 +1,58 @@
 "use client";
 
-import { AnimatedCard, Card } from "../ui/card";
+import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { useUserProfile } from "@/contexts/user-profile";
+import { useUserProfile } from "@/contexts/use-user-profile";
+import { Skeleton } from "../ui/skeleton";
+import {CreateLaneFormDialog} from "./lane-form-dialog";
+import LanesGrid from "./lanes-grid";
+
+const InitialLoadingState = () => {
+  return (
+    <Skeleton className="flex h-[calc(100%-80px)] w-full flex-col gap-2" />
+  );
+};
 
 const EmptyState = () => {
   const { isCurrentUser } = useUserProfile();
+  const { refetchLanes } = useUserProfile();
 
   return (
-    <AnimatedCard className="flex h-full w-full flex-col items-center pt-20">
-      <h1 className="text-3xl font-medium tracking-wide">No Memory Lanes :(</h1>
+    <Card className="flex h-full w-full flex-col items-center gap-1 pt-10 text-center">
+      <h1 className="text-xl font-medium tracking-wide">No memories to show</h1>
       {isCurrentUser && (
-        <div>
-          <p className="text-lg text-gray-500">
-            Create a memory lane to start adding memories.
+        <>
+          <p className="max-w-[250px] text-gray-500">
+            Let&apos;s create a new memory lane to start adding memories.
           </p>
-          <Button>New Memory Lane</Button>
-        </div>
+          <CreateLaneFormDialog
+            trigger={
+              <Button className="mt-3" size="lg" variant={"default"}>
+                Get Started
+              </Button>
+            }
+            onSuccess={refetchLanes}
+          />
+        </>
       )}
-    </AnimatedCard>
+    </Card>
   );
 };
 
 const LanesView: React.FC = () => {
-  const { isCurrentUser, memoryLanes } = useUserProfile();
+  const { memoryLanes, isInitialFetching } = useUserProfile();
+
+  if (isInitialFetching) {
+    return <InitialLoadingState />;
+  }
 
   if (!memoryLanes.length) {
     return <EmptyState />;
   }
 
   return (
-    <div className="flex h-full w-full flex-col gap-2">
-      {/* <Card className="h-full w-full p-3">
-        <div className="flex flex-row items-center justify-between">
-          <Button>New Memory Lane</Button>
-        </div>
-      </Card> */}
+    <div className="flex h-[calc(100%-80px)] w-full flex-col gap-2">
+      <LanesGrid />
     </div>
   );
 };

@@ -56,7 +56,7 @@ const LoginForm: React.FC = () => {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your username" {...field} />
+                <Input placeholder="Enter your username" {...field} autoComplete="off" />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -4,8 +4,10 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { magilio, pally } from "./fonts/fonts";
+import { GeistSans } from "geist/font/sans";
 import Header from "@/components/header/header";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
   title: "Memory Lane",
@@ -17,12 +19,18 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${pally.variable} ${magilio.variable}`}>
+    <html
+      lang="en"
+      className={`${GeistSans.variable} ${pally.variable} ${magilio.variable}`}
+    >
       <body>
         <TRPCReactProvider>
+        <TooltipProvider>
+
           <Header />
           {children}
-          <Toaster />
+          </TooltipProvider>
+          <Toaster pauseWhenPageIsHidden />
         </TRPCReactProvider>
       </body>
     </html>

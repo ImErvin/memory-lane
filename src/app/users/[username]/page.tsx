@@ -1,6 +1,6 @@
 import LanesView from "@/components/lanes/lanes-view";
 import ProfileBanner from "@/components/profile/banner";
-import { UserProfileProvider } from "@/contexts/user-profile";
+import { UserProfileProvider } from "@/contexts/use-user-profile";
 import { HydrateClient } from "@/trpc/server";
 
 interface Props {
@@ -13,7 +13,7 @@ export default async function MemoryLanePage({ params }: Props) {
   return (
     <HydrateClient>
       <UserProfileProvider username={username}>
-        <main className="mx-auto flex w-full min-h-screen h-full max-w-hd flex-col px-4 pt-[calc(72px+16px)] pb-4 gap-10">
+        <main className="mx-auto flex w-full min-h-screen h-full max-w-hd flex-col px-4 pt-[calc(72px+8px)] pb-4">
           <ProfileBanner />
           <LanesView />
         </main>

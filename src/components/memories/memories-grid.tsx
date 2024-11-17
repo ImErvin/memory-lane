@@ -1,62 +1,31 @@
 "use client";
 
-import { useUserMemories } from "@/contexts/user-memories";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Button } from "../ui/button";
-import Link from "next/link";
-import useUserStore from "@/stores/user-store";
-
-const NoMemories: React.FC = () => {
-  const { username } = useUserMemories();
-  const { username: signedInUsername } = useUserStore();
-
-  const isSignedInUser = signedInUsername === username;
-
-  return (
-    <Card className="m-auto flex w-full max-w-[360px] flex-col">
-      <CardHeader>
-        <CardTitle className="text-xl tracking-normal">
-          Nothing to see here 🤷‍♂️
-        </CardTitle>
-        <CardDescription className="w-full">
-          <p className="max-w-full text-wrap break-words">
-            {isSignedInUser ? "You haven't" : `${username} hasn't`} added any
-            memories yet.
-          </p>
-        </CardDescription>
-      </CardHeader>
-      <CardFooter className="flex flex-row items-center justify-between gap-4">
-        <Link href="/">
-          <Button variant="secondary" size="sm">
-            Go Home
-          </Button>
-        </Link>
-        {isSignedInUser && (
-          <Link href="/add">
-            <Button variant="default" size="sm">
-              Add your first memory
-            </Button>
-          </Link>
-        )}
-      </CardFooter>
-    </Card>
-  );
-};
+import { useMemoryLane } from "@/contexts/use-memory-lane";
+import MemoryView from "./memory-view";
+import { useScroll } from "@react-spring/web";
 
 const MemoriesGrid: React.FC = () => {
-  const { memories } = useUserMemories();
+  const { memories } = useMemoryLane();
 
-  if (true) {
-    return <NoMemories />;
-  }
-
-  return <h1>hey</h1>;
+  return (
+    <>
+      <div className="h-full max-h-[20%] flex-shrink-0 bg-gradient-to-t from-white via-white to-transparent" />
+      <div className="grid gap-10 bg-black">
+        {memories.map((memory, i) => {
+          return (
+            <MemoryView
+              key={memory.id}
+              name={memory.name}
+              description={memory.description}
+              id={memory.id}
+              timestamp={memory.timestamp}
+              pageNumber={i}
+            />
+          );
+        })}
+      </div>
+    </>
+  );
 };
 
 export default MemoriesGrid;

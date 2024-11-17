@@ -1,15 +1,12 @@
 import useUserStore from "@/stores/user-store";
 import { Button } from "../ui/button";
 import BoringAvatar from "../ui/boring-avatar";
-import {
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-} from "../ui/card";
+import { CardContent, CardFooter } from "../ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Link from "next/link";
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { clsx } from "clsx";
 
 const AUTHENTICATED_PATHS = (username: string) => [
   {
@@ -20,7 +17,7 @@ const AUTHENTICATED_PATHS = (username: string) => [
 
 export const ProfileAction: React.FC = () => {
   const { username, clearUser: signout } = useUserStore();
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Dont expect to hit this state as ProfileAction should only be rendered when username is present
   if (!username) {
@@ -28,15 +25,23 @@ export const ProfileAction: React.FC = () => {
   }
 
   return (
-    <Popover onOpenChange={setIsPopoverOpen} open={isPopoverOpen}>
+    <Popover onOpenChange={setIsOpen} open={isOpen}>
       <PopoverTrigger asChild>
         <Button
           variant={"secondary"}
           size={"lg"}
-          className="flex max-w-48 gap-6 pl-3"
+          className="flex gap-6 pl-3 pr-3"
         >
           <BoringAvatar name={username} size={"sm"} className="mr-auto" />
-          <p className="mr-auto max-w-full truncate">{username}</p>
+          <p className="mr-auto hidden max-w-full truncate md:block">
+            {username}
+          </p>
+          <ChevronDown
+            className={clsx(
+              "ml-auto hidden md:block transition-transform",
+              isOpen ? "rotate-180" : "rotate-0",
+            )}
+          />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -45,16 +50,6 @@ export const ProfileAction: React.FC = () => {
         side="top"
         sideOffset={8}
       >
-        <CardHeader className="block p-2 px-3 lg:hidden">
-          <CardDescription className="flex flex-col gap-1">
-            <p className="text-xs">Signed in as</p>
-            <div className="flex w-full flex-row items-center gap-2">
-              <BoringAvatar name={username} size={"xs"} />
-
-              <p className="max-w-full truncate text-base">{username}</p>
-            </div>
-          </CardDescription>
-        </CardHeader>
         <CardContent className="px-1 pb-1 pt-1">
           {username &&
             AUTHENTICATED_PATHS(username).map((path) => (
@@ -63,7 +58,7 @@ export const ProfileAction: React.FC = () => {
                   variant={"ghost"}
                   size={"lg"}
                   className="w-full justify-start"
-                  onClick={() => setIsPopoverOpen(false)}
+                  onClick={() => setIsOpen(false)}
                 >
                   {path.name}
                 </Button>

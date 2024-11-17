@@ -30,5 +30,5 @@ model Memory {
   updatedAt   DateTime @updatedAt()
 
   laneId Int
-  lane   Lane @relation(fields: [laneId], references: [id])
+  lane   Lane @relation(fields: [laneId], references: [id], onDelete: Cascade)
 }

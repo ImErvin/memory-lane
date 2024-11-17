@@ -1,4 +1,5 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
+import { animated } from "@react-spring/web";
 
 function Skeleton({
   className,
@@ -6,10 +7,12 @@ function Skeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("animate-pulse rounded-md bg-primary/10", className)}
+      className={cn("animate-pulse rounded-md bg-primary/5", className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Skeleton }
+export const AnimatedSkeleton = animated(Skeleton);
+
+export { Skeleton };

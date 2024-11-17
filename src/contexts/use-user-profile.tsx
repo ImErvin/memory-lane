@@ -2,6 +2,7 @@
 import { type AppRouter } from "@/server/api/root";
 import useUserStore from "@/stores/user-store";
 import { api } from "@/trpc/react";
+import { type RefetchOptions } from "@tanstack/react-query";
 import { type inferProcedureOutput } from "@trpc/server";
 import React, { createContext, useContext } from "react";
 
@@ -11,6 +12,7 @@ interface UserProfileContextProps {
   memoryLanes: inferProcedureOutput<AppRouter["lanes"]["getAllForUsername"]>;
   isRevalidating: boolean;
   isInitialFetching: boolean;
+  refetchLanes: ReturnType<typeof api.lanes.getAllForUsername.useQuery>['refetch'];
 }
 
 const UserProfileContext = createContext<UserProfileContextProps | undefined>(
@@ -28,13 +30,14 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
 }) => {
   const { username: currentUser } = useUserStore();
 
-  const [memoryLanes, {
-    isFetching,
+  const {
+    data: memoryLanes = [],
     isLoading,
-  }] =
-    api.lanes.getAllForUsername.useSuspenseQuery({
-      creator: username,
-    });
+    isFetching,
+    refetch,
+  } = api.lanes.getAllForUsername.useQuery({
+    creator: username,
+  });
 
   return (
     <UserProfileContext.Provider
@@ -43,7 +46,8 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
         memoryLanes,
         username,
         isRevalidating: isFetching,
-        isInitialFetching: isLoading
+        isInitialFetching: isLoading,
+        refetchLanes: refetch,
       }}
     >
       {children}
