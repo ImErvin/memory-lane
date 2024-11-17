@@ -35,11 +35,13 @@ export const MemoryLaneProvider: React.FC<MemoryLaneProviderProps> = ({
   children,
 }) => {
   const {
-    data: lane = initialLane,
+    data: lane,
     isFetching,
     isLoading,
     refetch: refetchLane,
-  } = api.lanes.getOne.useQuery({ id: laneId });
+  } = api.lanes.getOne.useQuery({ id: laneId }, {
+    initialData: initialLane,
+  });
 
   const {
     data: memories = [],
