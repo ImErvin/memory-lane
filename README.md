@@ -29,6 +29,8 @@ The current app features two main models:
 - **Lanes**: Collections that own memories.
 - **Memories**: Individual records within lanes.
 
+![alt text](image-1.png)
+
 Since there is no user model, I’m saving the provided username directly via the API. While this isn't secure, the project’s primary goal was not user authentication but rather to showcase the concept. This can be enhanced later by introducing a user model and using an authentication solution like NextAuth to manage JWTs and sessions.
 
 ### UI and Animations
