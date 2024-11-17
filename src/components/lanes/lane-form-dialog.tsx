@@ -122,13 +122,10 @@ const DeleteLaneDialog: React.FC<DeleteLaneDialogProps> = (props) => {
       props.onSuccess();
     },
     onError: (error) => {
-      if (error.message) {
-        toast.error(error.message);
-      } else {
-        toast.error(
+      toast.error(
+        error.message ||
           "We couldn't delete the memory lane. Please try again later.",
-        );
-      }
+      );
     },
   });
 

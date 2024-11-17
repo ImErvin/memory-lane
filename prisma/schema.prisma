@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
 }
 
 model Lane {
@@ -31,4 +31,15 @@ model Memory {
 
   laneId Int
   lane   Lane @relation(fields: [laneId], references: [id], onDelete: Cascade)
+
+  images Image[]
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String
+  uploader  String
+  createdAt DateTime @default(now())
+  memoryId  Int
+  memory    Memory   @relation(fields: [memoryId], references: [id], onDelete: Cascade)
 }

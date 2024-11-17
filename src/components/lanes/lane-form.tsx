@@ -59,13 +59,10 @@ const LaneForm: React.FC<LaneFormProps> = (props) => {
       props.onSuccess();
     },
     onError: (error) => {
-      if (error.message) {
-        toast.error(error.message);
-      } else {
-        toast.error(
+      toast.error(
+        error.message ||
           "We couldn't create the memory lane. Please try again later.",
-        );
-      }
+      );
     },
   });
 
@@ -89,13 +86,10 @@ const LaneForm: React.FC<LaneFormProps> = (props) => {
       props.onSuccess();
     },
     onError: (error) => {
-      if (error.message) {
-        toast.error(error.message);
-      } else {
-        toast.error(
+      toast.error(
+        error.message ||
           "We couldn't update the memory lane. Please try again later.",
-        );
-      }
+      );
     },
   });
 
@@ -133,7 +127,10 @@ const LaneForm: React.FC<LaneFormProps> = (props) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col space-y-4"
+      >
         <FormField
           control={form.control}
           name="name"
@@ -168,7 +165,9 @@ const LaneForm: React.FC<LaneFormProps> = (props) => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="ml-auto">Save changes</Button>
+        <Button type="submit" className="ml-auto">
+          Save changes
+        </Button>
       </form>
     </Form>
   );

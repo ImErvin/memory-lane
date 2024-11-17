@@ -129,11 +129,7 @@ const DeleteMemoryDialog: React.FC<DeleteMemoryDialogProps> = (props) => {
       setIsOpen(false);
     },
     onError: (error) => {
-      if (error.message) {
-        toast.error(error.message);
-      } else {
-        toast.error("We couldn't delete the memory. Please try again later.");
-      }
+      toast.error(error.message || "We couldn't delete the memory. Please try again later.");
     },
   });
 

@@ -25,10 +25,9 @@ export default function RootLayout({
     >
       <body>
         <TRPCReactProvider>
-        <TooltipProvider>
-
-          <Header />
-          {children}
+          <TooltipProvider>
+            <Header />
+            {children}
           </TooltipProvider>
           <Toaster pauseWhenPageIsHidden />
         </TRPCReactProvider>

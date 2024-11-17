@@ -9,6 +9,10 @@ const memoryInputSchema = z.object({
   timestamp: z.string().optional(),
   laneId: z.number(),
   creator: z.string(),
+  images: z
+    .array(z.string().url())
+    .min(1, "At least one image URL is required")
+    .max(1, "Maximum of 1 image URLs allowed"),
 });
 
 const memoryUpdateSchema = z.object({
@@ -17,6 +21,7 @@ const memoryUpdateSchema = z.object({
   description: z.string().optional(),
   timestamp: z.string().optional(),
   creator: z.string(),
+  images: z.array(z.string().url()).optional(),
 });
 
 export const memoriesRouter = createTRPCRouter({
@@ -30,10 +35,7 @@ export const memoriesRouter = createTRPCRouter({
       });
 
       if (!lane) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Lane not found",
-        });
+        throw new TRPCError({ code: "NOT_FOUND", message: "Lane not found" });
       }
 
       if (lane.creator !== input.creator) {
@@ -49,6 +51,17 @@ export const memoriesRouter = createTRPCRouter({
           description: input.description,
           timestamp: input.timestamp ? new Date(input.timestamp) : undefined,
           laneId: input.laneId,
+          images: {
+            // Currently only allowing 1 image upload on the FE and zod
+            // but can be extended to allow multiple images later
+            create: input.images.map((url) => ({
+              url,
+              uploader: input.creator,
+            })),
+          },
+        },
+        include: {
+          images: true,
         },
       });
 
@@ -66,10 +79,9 @@ export const memoriesRouter = createTRPCRouter({
       if (!ctx.db.memory) throw new DbConnectionError();
 
       const memory = await ctx.db.memory.findUnique({
-        where: {
-          id: input.id,
-        },
+        where: { id: input.id },
         include: {
+          images: true,
           lane: {
             select: {
               creator: true,
@@ -82,10 +94,7 @@ export const memoriesRouter = createTRPCRouter({
       });
 
       if (!memory) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Memory not found",
-        });
+        throw new TRPCError({ code: "NOT_FOUND", message: "Memory not found" });
       }
 
       return memory;
@@ -97,23 +106,16 @@ export const memoriesRouter = createTRPCRouter({
       if (!ctx.db.memory) throw new DbConnectionError();
 
       const existingMemory = await ctx.db.memory.findUnique({
-        where: {
-          id: input.id,
-        },
+        where: { id: input.id },
         include: {
           lane: {
-            select: {
-              creator: true,
-            },
+            select: { creator: true },
           },
         },
       });
 
       if (!existingMemory) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Memory not found",
-        });
+        throw new TRPCError({ code: "NOT_FOUND", message: "Memory not found" });
       }
 
       if (existingMemory.lane.creator !== input.creator) {
@@ -123,18 +125,28 @@ export const memoriesRouter = createTRPCRouter({
         });
       }
 
-      const memory = await ctx.db.memory.update({
-        where: {
-          id: input.id,
-        },
+      const updatedMemory = await ctx.db.memory.update({
+        where: { id: input.id },
         data: {
           name: input.name,
           description: input.description,
           timestamp: input.timestamp ? new Date(input.timestamp) : undefined,
+          images: input.images
+            ? {
+                deleteMany: {},
+                create: input.images.map((url) => ({
+                  url,
+                  uploader: input.creator,
+                })),
+              }
+            : undefined,
+        },
+        include: {
+          images: true,
         },
       });
 
-      return memory;
+      return updatedMemory;
     }),
 
   deleteOne: publicProcedure
@@ -148,23 +160,16 @@ export const memoriesRouter = createTRPCRouter({
       if (!ctx.db.memory) throw new DbConnectionError();
 
       const existingMemory = await ctx.db.memory.findUnique({
-        where: {
-          id: input.id,
-        },
+        where: { id: input.id },
         include: {
           lane: {
-            select: {
-              creator: true,
-            },
+            select: { creator: true },
           },
         },
       });
 
       if (!existingMemory) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Memory not found",
-        });
+        throw new TRPCError({ code: "NOT_FOUND", message: "Memory not found" });
       }
 
       if (existingMemory.lane.creator !== input.creator) {
@@ -175,9 +180,7 @@ export const memoriesRouter = createTRPCRouter({
       }
 
       const memory = await ctx.db.memory.delete({
-        where: {
-          id: input.id,
-        },
+        where: { id: input.id },
       });
 
       return memory;
@@ -194,11 +197,12 @@ export const memoriesRouter = createTRPCRouter({
       if (!ctx.db.memory) throw new DbConnectionError();
 
       const memories = await ctx.db.memory.findMany({
-        where: {
-          laneId: input.laneId,
-        },
+        where: { laneId: input.laneId },
         orderBy: {
-          timestamp: input.orderBy || "desc",
+          timestamp: input.orderBy ?? "desc",
+        },
+        include: {
+          images: true,
         },
       });
 

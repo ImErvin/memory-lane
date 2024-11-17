@@ -32,7 +32,7 @@ const LoadingState: React.FC = () => {
     <div className="relative flex h-24 flex-shrink-0 items-center overflow-hidden">
       <Skeleton className="relative ml-auto flex h-16 w-full flex-col items-start justify-center gap-0.5 rounded-l-full rounded-r-full bg-opacity-45 py-1" />
 
-      <Skeleton className="absolute left-[calc(100%-64px)] z-20 h-16 w-16 rounded-full" />
+      <Skeleton className="absolute left-0 z-20 h-16 w-16 rounded-full" />
     </div>
   );
 };
@@ -66,12 +66,12 @@ const ProfileBanner: React.FC = () => {
 
   const bannerMaskSpring = useSpring({
     from: {
-      width: "calc(100% - 20px)",
+      opacity: 0,
       paddingLeft: "0px",
       paddingRight: "0px",
     },
     to: {
-      width: "calc(100% - 20px)",
+      opacity: 1,
       paddingLeft: "58px",
       paddingRight: "16px",
     },
@@ -105,7 +105,7 @@ const ProfileBanner: React.FC = () => {
   return (
     <div className="relative flex h-24 flex-shrink-0 items-center overflow-hidden">
       <AnimatedCard
-        className="relative ml-auto flex h-16 w-full flex-row items-center justify-between gap-1.5 border-0 py-1"
+        className="relative ml-auto flex h-16 w-[calc(100%-20px)] flex-row items-center justify-between gap-1.5 border-0 py-1"
         style={{
           background: bannerBg,
           ...bannerMaskSpring,

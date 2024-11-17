@@ -1,10 +1,11 @@
 "use client";
 
+import { useState, useRef } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { upload } from "@vercel/blob/client";
 import type React from "react";
-
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -20,8 +21,16 @@ import { toast } from "sonner";
 import useUserStore from "@/stores/user-store";
 import { useRouter } from "next/navigation";
 import { Textarea } from "../ui/textarea";
+import { convertImageToWebP } from "@/lib/utils";
 
-// Define the form schema with validation using Zod
+const MAX_FILE_SIZE = 3000000;
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+
 const formSchema = z.object({
   name: z
     .string()
@@ -32,6 +41,17 @@ const formSchema = z.object({
     .max(250, "Description must be at most 250 characters")
     .optional(),
   timestamp: z.string().min(10, { message: "Invalid date" }),
+  image: z
+    .any()
+    .refine((files: File[]) => files?.length == 1, "A picture is required.")
+    .refine(
+      (files: File[]) => files[0] && files[0].size <= MAX_FILE_SIZE,
+      `File size should be less than 3mb.`,
+    )
+    .refine(
+      (files: File[]) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type ?? ""),
+      "Only these types are allowed .jpg, .jpeg, .png and .webp",
+    ),
 });
 
 interface MemoryFormProps {
@@ -46,6 +66,8 @@ interface MemoryFormProps {
 const MemoryForm: React.FC<MemoryFormProps> = (props) => {
   const { username } = useUserStore();
   const router = useRouter();
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const { mutate: createMemory } = api.memories.createOne.useMutation({
     onSuccess: (data) => {
@@ -60,11 +82,10 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
       props.onSuccess();
     },
     onError: (error) => {
-      if (error.message) {
-        toast.error(error.message);
-      } else {
-        toast.error("We couldn't create the memory. Please try again later.");
-      }
+      toast.error(
+        error.message ||
+          "We couldn't create the memory. Please try again later.",
+      );
     },
   });
 
@@ -81,11 +102,10 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
       props.onSuccess();
     },
     onError: (error) => {
-      if (error.message) {
-        toast.error(error.message);
-      } else {
-        toast.error("We couldn't update the memory. Please try again later.");
-      }
+      toast.error(
+        error.message ||
+          "We couldn't update the memory. Please try again later.",
+      );
     },
   });
 
@@ -95,34 +115,70 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
       name: props.name ?? "",
       description: props.description ?? "",
       timestamp: props.timestamp ?? "",
+      image: undefined,
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!username) {
-      return;
-    }
+  const imageRef = form.register("image", { required: true });
 
-    if (props.id) {
-      updateMemory({
-        id: props.id,
-        name: values.name,
-        description: values.description,
-        timestamp: values.timestamp
-          ? new Date(values.timestamp).toISOString()
-          : undefined,
-        creator: username,
+  const handleUploadImage = async (file: File) => {
+    setIsUploadingFile(true);
+
+    try {
+      // Trying to add some sort of image optimization on client side
+      // this uses a canvas to resize the image and convert it to webp with a lower quality
+      // could be improved by either using a service or a web worker or something else
+      const optimizedBlob = await convertImageToWebP(file, 0.75);
+
+      const optimizedFile = new File(
+        [optimizedBlob],
+        `${file.name.split(".")[0]}.webp`,
+        {
+          type: "image/webp",
+        },
+      );
+
+      const newBlob = await upload(optimizedFile.name, optimizedFile, {
+        access: "public",
+        handleUploadUrl: "/api/memory/upload",
       });
+
+      if (!newBlob) return;
+
+      return newBlob.url;
+    } catch (error) {
+      console.error(error);
+      toast.error("We couldn't upload the image. Please try again later.");
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!username) return;
+    // Can assume that the validation has already passed
+    // Casting as zod does not have a way to infer the type "file"
+    const [imageFile] = values.image as File[];
+    const imageUrl = await handleUploadImage(imageFile!);
+
+    if (!imageUrl) return;
+
+    const payload = {
+      id: props.id ?? -1,
+      laneId: props.laneId,
+      name: values.name,
+      description: values.description,
+      timestamp: values.timestamp
+        ? new Date(values.timestamp).toISOString()
+        : undefined,
+      creator: username,
+      images: [imageUrl],
+    };
+
+    if (payload.id) {
+      updateMemory(payload);
     } else {
-      createMemory({
-        laneId: props.laneId,
-        name: values.name,
-        description: values.description,
-        timestamp: values.timestamp
-          ? new Date(values.timestamp).toISOString()
-          : undefined,
-        creator: username,
-      });
+      createMemory(payload);
     }
   };
 
@@ -179,6 +235,26 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="image"
+          render={() => (
+            <FormItem>
+              <FormLabel>Picture</FormLabel>
+              <FormControl>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="file"
+                    accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                    {...imageRef}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit" className="ml-auto">
           Save changes
         </Button>
