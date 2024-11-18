@@ -21,6 +21,7 @@ import useUserStore from "@/stores/user-store";
 import { usePathname, useRouter } from "next/navigation";
 import { Textarea } from "../ui/textarea";
 import { useEffect, useRef } from "react";
+import { track } from "@vercel/analytics";
 
 // Define the form schema with validation using Zod
 const formSchema = z.object({
@@ -54,6 +55,11 @@ const LaneForm: React.FC<LaneFormProps> = (props) => {
           duration: 3000,
         },
       );
+      track("memory_lane_created", {
+        laneId: data.id,
+        laneName: data.name,
+        username: data.creator,
+      });
       router.push(`/lanes/${data.id}`);
       props.onSuccess();
     },
@@ -69,6 +75,12 @@ const LaneForm: React.FC<LaneFormProps> = (props) => {
     api.lanes.updateOne.useMutation({
       onSuccess: (data) => {
         const isOnCurrentPage = pathName === `/lanes/${data.id}`;
+
+        track("memory_lane_updated", {
+          laneId: data.id,
+          laneName: data.name,
+          username: data.creator,
+        });
 
         toast.success("Memory lane updated successfully", {
           ...(isOnCurrentPage

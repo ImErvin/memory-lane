@@ -53,6 +53,10 @@ Basic image optimization is implemented using a canvas element to convert images
 
 I implemented error handling and toast notifications to keep users informed about the state of the application at all times, using descriptive errors where possible. This approach ensures a more user-friendly experience and helps communicate issues when they arise.
 
+### Analytics
+
+I’m currently utilizing Vercel Analytics to track key events, such as the creation of Memory Lanes and Memories, as well as user sign-ins. While I’m on the free tier and keeping it simple for now, there is potential to expand the tracking scope. For instance, we could monitor more detailed interactions, like whether users are using the context menu ("...") to delete their lanes or opting for the toolbar at the top of the Memory Lane page.
+
 ### Deployment
 
 For deployment, I used **Neon** as the database and **Vercel Blob Storage** for image hosting. Having exhausted my free GCP credits, I opted for an all-Vercel setup, which has performed well so far.

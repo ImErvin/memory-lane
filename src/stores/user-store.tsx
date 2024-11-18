@@ -1,3 +1,4 @@
+import { track } from "@vercel/analytics";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -12,8 +13,15 @@ const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       username: null,
-      setUsername: (username) =>
-        set({ username, lastUpdated: new Date().getTime() }),
+      setUsername: (username) => {
+        if (username) {
+          track("login", {
+            username,
+          });
+        }
+
+        set({ username, lastUpdated: new Date().getTime() });
+      },
       clearUser: () => set({ username: null, lastUpdated: 0 }),
     }),
     {

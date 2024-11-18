@@ -22,6 +22,7 @@ import { Textarea } from "../ui/textarea";
 import { useEffect } from "react";
 import { ACCEPTED_IMAGE_TYPES } from "./memory-form";
 import { handleUploadImage } from "@/lib/utils";
+import { track } from "@vercel/analytics";
 
 const formSchemaUpdate = z.object({
   name: z
@@ -61,6 +62,16 @@ const UpdateMemoryForm: React.FC<UpdateMemoryFormProps> = (props) => {
             },
           },
         });
+
+        track("memory_updated", {
+          laneId: data.laneId,
+          memoryId: data.id,
+          memoryName: data.name,
+          timestamp:
+            data?.timestamp?.toISOString()?.split("T")?.[0] ?? "unknown",
+            username,
+        });
+
         props.onSuccess();
       },
       onError: (error) => {

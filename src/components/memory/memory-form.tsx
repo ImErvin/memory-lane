@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { Textarea } from "../ui/textarea";
 import { handleUploadImage } from "@/lib/utils";
 import ExifReader from "exifreader";
+import { track } from "@vercel/analytics";
 
 export const MAX_FILE_SIZE = 10000000;
 export const ACCEPTED_IMAGE_TYPES = [
@@ -74,6 +75,16 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
             },
           },
         });
+
+        track("memory_created", {
+          laneId: data.laneId,
+          memoryId: data.id,
+          memoryName: data.name,
+          timestamp:
+            data?.timestamp?.toISOString()?.split("T")?.[0] ?? "unknown",
+          username,
+        });
+
         props.onSuccess();
       },
       onError: (error) => {
