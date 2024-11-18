@@ -41,11 +41,17 @@ Since there is no user model, I’m saving the provided username directly via th
 
 I utilized **shadcn** for UI components, which simplifies styling compared to manually working with Radix UI. While the design isn't particularly polished, it incorporates some good UX practices and could certainly be visually improved.
 
+> Known Issue: There is an issue with shadcn components on iOS mobile devices where input auto-focus sometimes clashes with the phone keyboard.
+
 I also integrated **react-spring** to add animations and demonstrate my proficiency. Admittedly, some animations might feel a bit over-the-top, but they serve as examples for this demo. I plan to fix some of the jumpy transitions—I didn’t get a chance to fully QA every interaction, and invalidating data on TanStack's React Query (the client for tRPC) is a bit new to me, so with more time, I would polish this part further.
 
 ### Image Handling and Optimization
 
 Basic image optimization is implemented using a canvas element to convert images to the **WebP** format and apply basic lossy optimization via `canvas.toBlob`. This ensures optimal space usage by resizing images appropriately. Additionally, the app deletes old images when a memory is updated or deleted, maintaining efficient storage practices.
+
+### Error Handling and User Notifications
+
+I implemented error handling and toast notifications to keep users informed about the state of the application at all times, using descriptive errors where possible. This approach ensures a more user-friendly experience and helps communicate issues when they arise.
 
 ### Deployment
 
@@ -69,7 +75,7 @@ After deploying the application and receiving feedback from friends during user 
 
 1. The process of creating a memory lane and subsequently adding memories feels overly complex and should be simplified. A possible enhancement could be implementing an onboarding flow that allows users to create a lane and immediately add memories to it.
 
-    > I later added ExifData package to automatically attempt to find the date the image was taken and autofill the timestamp hopefully improving the UX slightly
+    > I later added ExifData package to automatically attempt to find the date the image was taken and autofill the timestamp hopefully improving the UX slightly - though it doesn't seem to work really well lol
 2. Users expressed a desire to use the app similarly to Instagram, wanting to create picture collections akin to albums without placing much importance on adding timestamps.
 3. Users raised concerns about all memory lanes being public by default. They wanted the ability to keep some lanes private.
 
