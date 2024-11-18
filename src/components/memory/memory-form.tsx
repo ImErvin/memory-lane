@@ -174,10 +174,6 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
                     if (tags.DateTimeOriginal) {
                       const dateTimeOriginal =
                         tags.DateTimeOriginal.description;
-                      console.log(
-                        "Date and time photo was taken:",
-                        dateTimeOriginal,
-                      );
 
                       const formattedDate = new Date(dateTimeOriginal)
                         .toISOString()
