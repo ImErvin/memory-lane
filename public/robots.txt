@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /users
+Disallow: /users/*
+
+Sitemap: https://ervin-memorylane.vercel.app/sitemap.xml
