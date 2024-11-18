@@ -78,6 +78,7 @@ const MemoryPage: React.FC<MemoryPageProps> = (props) => {
           alt={"background image"}
           layout="fill"
           objectFit="cover"
+          className="blur-md"
         />
       </animated.div>
       <div
