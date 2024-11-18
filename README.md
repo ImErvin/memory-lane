@@ -51,13 +51,14 @@ Basic image optimization is implemented using a canvas element to convert images
 
 For deployment, I used **Neon** as the database and **Vercel Blob Storage** for image hosting. Having exhausted my free GCP credits, I opted for an all-Vercel setup, which has performed well so far.
 
-### Future Improvements
-
+Product Future Improvements
 The app could greatly benefit from a comprehensive redesign to establish a stronger visual identity. Due to time constraints, I wasn't able to create design concepts in Figma, so the current UI was developed through trial and error to find what worked best.
 
 Currently, any user can edit another user's memories or lanes, as the only requirement for signing in is providing a username. Enhancing user authentication and access control would be a logical next step to improve security and user experience.
 
 I chose not to implement multiple image uploads initially due to the added UI complexity (e.g., managing an array of images in a compact dialog, allowing users to reorder images, etc.). Additionally, handling potential issues like partial failures during batch uploads was outside the initial project scope. However, given more time, these features could be developed and integrated.
+
+I would also want to implement infinite loading/pagination for all of the gridded views. While the current data set is manageable, as it grows, the app could struggle to perform efficiently if it attempts to load all data at once. Implementing infinite loading would ensure better performance and a smoother user experience by fetching and displaying data incrementally as the user scrolls. For now I've kept it optimistic as it's just an MVP.
 
 Additional features such as enabling users to like a memory or lane, and showcasing highlighted lanes of the week on the homepage, are also potential enhancements to enrich user engagement.
 
@@ -75,4 +76,4 @@ Special thanks to **ChatGPT** for helping format this document and to **CoPilot*
 
 ---
 
-You can explore the project at: [ervin-memorylane.vercel.app](https://ervin-memorylane.vercel.app)
+Again, you can explore the project at: [ervin-memorylane.vercel.app](https://ervin-memorylane.vercel.app)

@@ -7,10 +7,10 @@ import {
   useIsomorphicLayoutEffect,
   useSpring,
 } from "@react-spring/web";
-import MemoryLanePlaque from "./memory-lane-plaque";
+import MemoryLanePlaque from "./lane-plaque";
 import { Button } from "../ui/button";
 import { CreateMemoryFormDialog } from "../memory/memory-form-dialog";
-import MemoriesGrid from "../memories/memories-grid";
+import MemoriesGrid from "../memories/memory-grid";
 import useUserStore from "@/stores/user-store";
 
 const EmptyState = () => {

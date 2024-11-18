@@ -3,7 +3,7 @@
 import { type AppRouter } from "@/server/api/root";
 import { api } from "@/trpc/react";
 import { type inferProcedureOutput } from "@trpc/server";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 
 interface MemoryLaneContextProps {
   lane: inferProcedureOutput<AppRouter["lanes"]["getOne"]>;
@@ -16,6 +16,8 @@ interface MemoryLaneContextProps {
   refetchMemories: ReturnType<
     typeof api.memories.getAllForLane.useQuery
   >["refetch"];
+  orderBy: "asc" | "desc";
+  setOrderBy: React.Dispatch<React.SetStateAction<"asc" | "desc">>;
 }
 
 const MemoryLaneContext = createContext<MemoryLaneContextProps | undefined>(
@@ -35,6 +37,8 @@ export const MemoryLaneProvider: React.FC<MemoryLaneProviderProps> = ({
   initialMemories,
   children,
 }) => {
+  const [orderBy, setOrderBy] = React.useState<"asc" | "desc">("desc");
+
   const {
     data: lane,
     isFetching,
@@ -54,12 +58,15 @@ export const MemoryLaneProvider: React.FC<MemoryLaneProviderProps> = ({
     isLoading: isMemoriesLoading,
     refetch: refetchMemories,
   } = api.memories.getAllForLane.useQuery(
-    { laneId },
+    { laneId, orderBy },
     {
       initialData: initialMemories,
-      enabled: !!initialMemories,
     },
   );
+
+  useEffect(() => {
+    void refetchMemories();
+  }, [orderBy]);
 
   return (
     <MemoryLaneContext.Provider
@@ -72,6 +79,8 @@ export const MemoryLaneProvider: React.FC<MemoryLaneProviderProps> = ({
         isRevalidatingMemories: isMemoriesFetching,
         refetchLane,
         refetchMemories,
+        orderBy,
+        setOrderBy,
       }}
     >
       {children}
