@@ -9,6 +9,7 @@ import { Edit, Plus, Trash2 } from "lucide-react";
 import { DeleteLaneDialog, UpdateLaneFormDialog } from "./lane-form-dialog";
 import { useRouter } from "next/navigation";
 import { CreateMemoryFormDialog } from "../memory/memory-form-dialog";
+import { toZonedTime } from "date-fns-tz";
 
 const MemoryLanePlaque = () => {
   const { lane, refetchLane, refetchMemories } = useMemoryLane();
@@ -19,7 +20,7 @@ const MemoryLanePlaque = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-hd flex-col items-start px-4 pb-10">
-      <div className="flex max-w-[300px] flex-col gap-2 pb-2 md:max-w-[500px]">
+      <div className="flex max-w-[360px] flex-col gap-2 pb-2 md:max-w-[500px]">
         <h1 className="font-magilio text-5xl font-bold">{lane.name}</h1>
         <p className="break-words font-medium text-primary">
           {lane?.description}
@@ -33,7 +34,7 @@ const MemoryLanePlaque = () => {
                 {username === lane.creator ? "You" : lane.creator}
               </Button>
             </Link>
-            on {format(new Date(lane.createdAt), "MMM dd, yyyy")}
+            on {format(toZonedTime(lane.createdAt, "UTC"), "MMM dd, yyyy")}
           </p>
         </div>
         {username === lane.creator && (

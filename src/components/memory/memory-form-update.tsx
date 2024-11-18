@@ -3,7 +3,6 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { upload } from "@vercel/blob/client";
 import type React from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -20,18 +19,11 @@ import { toast } from "sonner";
 import useUserStore from "@/stores/user-store";
 import { useRouter } from "next/navigation";
 import { Textarea } from "../ui/textarea";
+import { useEffect } from "react";
+import { ACCEPTED_IMAGE_TYPES } from "./memory-form";
 import { handleUploadImage } from "@/lib/utils";
-import ExifReader from "exifreader";
 
-export const MAX_FILE_SIZE = 10000000;
-export const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-];
-
-const formSchema = z.object({
+const formSchemaUpdate = z.object({
   name: z
     .string()
     .min(3, { message: "Name must be at least 3 characters." })
@@ -41,32 +33,27 @@ const formSchema = z.object({
     .max(250, "Description must be at most 250 characters")
     .optional(),
   timestamp: z.string().min(10, { message: "Invalid date" }),
-  image: z
-    .any()
-    .refine((files: File[]) => files?.length == 1, "A picture is required.")
-    .refine(
-      (files: File[]) => files[0] && files[0].size <= MAX_FILE_SIZE,
-      `File size should be less than ${MAX_FILE_SIZE / 1000000}MB.`,
-    )
-    .refine(
-      (files: File[]) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type ?? ""),
-      "Only these types are allowed .jpg, .jpeg, .png and .webp",
-    ),
+  image: z.any().optional(),
 });
 
-interface MemoryFormProps {
+interface UpdateMemoryFormProps {
   onSuccess: () => void;
   laneId: number;
+  name: string;
+  description?: string | null;
+  timestamp: string;
+  id: number;
+  imageUrl: string;
 }
 
-const MemoryForm: React.FC<MemoryFormProps> = (props) => {
+const UpdateMemoryForm: React.FC<UpdateMemoryFormProps> = (props) => {
   const { username } = useUserStore();
   const router = useRouter();
 
-  const { mutate: createMemory, isPending } =
-    api.memories.createOne.useMutation({
+  const { mutate: updateMemory, isPending } =
+    api.memories.updateOne.useMutation({
       onSuccess: (data) => {
-        toast.success("Memory created successfully", {
+        toast.success("Memory updated successfully", {
           action: {
             label: "View",
             onClick: () => {
@@ -79,32 +66,47 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
       onError: (error) => {
         toast.error(
           error.message ||
-            "We couldn't create the memory. Please try again later.",
+            "We couldn't update the memory. Please try again later.",
         );
       },
     });
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof formSchemaUpdate>>({
+    resolver: zodResolver(formSchemaUpdate),
     defaultValues: {
-      name: "",
-      description: "",
-      timestamp: "",
-      image: undefined,
+      name: props.name,
+      description: props.description ?? "",
+      timestamp:
+        (props.timestamp &&
+          new Date(props.timestamp).toISOString().split("T")[0]) ??
+        "",
+      image: props.imageUrl,
     },
   });
 
   const imageRef = form.register("image", { required: true });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  useEffect(() => {
+    if (props.imageUrl) {
+      form.setValue("image", props.imageUrl);
+    }
+  }, [props.imageUrl, form]);
+
+  const onSubmit = async (values: z.infer<typeof formSchemaUpdate>) => {
     if (!username) return;
 
-    const [imageFile] = values.image as File[];
-    const imageUrl = await handleUploadImage(imageFile!);
+    let imageUrl: string | undefined = props.imageUrl;
+
+    if (values.image !== props.imageUrl) {
+      const [imageFile] = values.image as File[];
+
+      imageUrl = await handleUploadImage(imageFile!);
+    }
 
     if (!imageUrl) return;
 
     const payload = {
+      id: props.id,
       laneId: props.laneId,
       name: values.name,
       description: values.description,
@@ -115,7 +117,7 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
       imageUrl,
     };
 
-    createMemory(payload);
+    updateMemory(payload);
   };
 
   return (
@@ -149,38 +151,6 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
               type="file"
               accept={ACCEPTED_IMAGE_TYPES.join(",")}
               {...imageRef}
-              onChange={async (e) => {
-                void imageRef.onChange(e);
-
-                if (!e.target.files) return;
-
-                const file = e.target.files[0];
-                if (file) {
-                  try {
-                    const arrayBuffer = await file.arrayBuffer();
-                    const tags = ExifReader.load(arrayBuffer);
-
-                    if (tags.DateTimeOriginal) {
-                      const dateTimeOriginal =
-                        tags.DateTimeOriginal.description;
-                      console.log(
-                        "Date and time photo was taken:",
-                        dateTimeOriginal,
-                      );
-
-                      const formattedDate = new Date(dateTimeOriginal)
-                        .toISOString()
-                        .split("T")[0];
-
-                      if (!formattedDate) return;
-
-                      form.setValue("timestamp", formattedDate);
-                    }
-                  } catch (error) {
-                    console.error("Error reading EXIF data:", error);
-                  }
-                }
-              }}
             />
           </FormControl>
           <FormMessage />
@@ -203,6 +173,7 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="timestamp"
@@ -222,11 +193,11 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
           className="ml-auto"
           isLoading={form.formState.isSubmitting || isPending}
         >
-          Save changes
+          Update memory
         </Button>
       </form>
     </Form>
   );
 };
 
-export default MemoryForm;
+export default UpdateMemoryForm;

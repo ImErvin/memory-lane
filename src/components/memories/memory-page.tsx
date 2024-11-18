@@ -23,6 +23,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import MemoryActionDropdownMenu from "../memory/memory-actions-popover";
 import useUserStore from "@/stores/user-store";
+import { toZonedTime } from "date-fns-tz";
 
 interface MemoryPageProps {
   memory: inferProcedureOutput<AppRouter["memories"]["getOne"]>;
@@ -37,11 +38,10 @@ const MemoryPage: React.FC<MemoryPageProps> = (props) => {
   });
 
   const fadeInOutSpring = useSpring({
-    from: { opacity: 0, scale: 1, filter: "blur(40px)" },
+    from: { opacity: 0, scale: 1 },
     to: {
       opacity: inView ? 1 : 0,
       scale: inView ? 1 : 1.1,
-      filter: "blur(20px)",
     },
     config: config.molasses,
   });
@@ -82,12 +82,12 @@ const MemoryPage: React.FC<MemoryPageProps> = (props) => {
       </animated.div>
       <div
         ref={ref}
-        className="relative z-10 mt-auto flex h-full max-h-[95%] min-h-[300px] w-full max-w-full flex-shrink items-center justify-center object-center p-4"
+        className="relative z-10 mt-auto flex h-full max-h-[80%] min-h-[300px] w-full max-w-full flex-shrink items-center justify-center object-center p-4"
       >
         <Image
           src={props.memory.imageUrl}
           alt={props.memory.name}
-          className="rounded-xl object-contain object-center"
+          className="rounded-xl object-contain object-center max-w-full max-h-full"
           width={1200}
           height={1200}
         />
@@ -107,6 +107,7 @@ const MemoryPage: React.FC<MemoryPageProps> = (props) => {
                 memoryId={props.memory.id}
                 name={props.memory.name}
                 timestamp={props.memory.timestamp.toISOString()}
+                imageUrl={props.memory.imageUrl}
               />
             )}
           </CardHeader>
@@ -117,12 +118,15 @@ const MemoryPage: React.FC<MemoryPageProps> = (props) => {
               </CardDescription>
             )}
             <h3 className="text-sm text-gray-500">
-              {format(new Date(props.memory.timestamp), "MMM dd, yyyy")}
+              {format(
+                toZonedTime(props.memory.timestamp, "UTC"),
+                "MMM dd, yyyy",
+              )}
             </h3>
           </CardContent>
           <CardFooter>
             <Link href={`/lanes/${props.memory.laneId}`}>
-              <Button variant="default" size="sm">
+              <Button variant="outline" size="sm">
                 See Lane
               </Button>
             </Link>

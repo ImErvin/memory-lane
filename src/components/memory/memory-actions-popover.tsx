@@ -20,6 +20,7 @@ interface MemoryActionDropdownMenuProps {
   creator: string;
   laneId: number;
   timestamp: string;
+  imageUrl: string;
 }
 
 const MemoryActionDropdownMenu: React.FC<MemoryActionDropdownMenuProps> = (
@@ -56,6 +57,7 @@ const MemoryActionDropdownMenu: React.FC<MemoryActionDropdownMenuProps> = (
               id: props.memoryId,
             });
           }}
+          imageUrl={props.imageUrl}
         />
         <DeleteMemoryDialog
           trigger={

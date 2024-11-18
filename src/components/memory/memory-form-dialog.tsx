@@ -18,6 +18,7 @@ import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import LoginForm from "../login/login-form";
 import { useRouter } from "next/navigation";
+import UpdateMemoryForm from "./memory-form-update";
 
 interface MemoryFormDialogProps {
   trigger?: React.ReactNode;
@@ -73,6 +74,7 @@ interface UpdateMemoryFormDialogProps {
   description?: string | null;
   timestamp: string;
   trigger: React.ReactNode;
+  imageUrl: string;
   onSuccess?: () => void;
 }
 
@@ -100,7 +102,7 @@ const UpdateMemoryFormDialog: React.FC<UpdateMemoryFormDialogProps> = (
         <div className="h-full w-full px-6 pb-6">
           {!username && <LoginForm />}
           {username && (
-            <MemoryForm
+            <UpdateMemoryForm
               id={props.memoryId}
               laneId={props.laneId}
               name={props.name}
@@ -116,6 +118,7 @@ const UpdateMemoryFormDialog: React.FC<UpdateMemoryFormDialogProps> = (
                 });
                 props.onSuccess?.();
               }}
+              imageUrl={props.imageUrl}
             />
           )}
         </div>

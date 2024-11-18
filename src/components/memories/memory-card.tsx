@@ -1,9 +1,4 @@
-import {
-  animated,
-  config,
-  useInView,
-  useSpring,
-} from "@react-spring/web";
+import { animated, config, useInView, useSpring } from "@react-spring/web";
 import {
   Card,
   CardContent,
@@ -17,6 +12,7 @@ import { format } from "date-fns/format";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import useUserStore from "@/stores/user-store";
+import { toZonedTime } from "date-fns-tz";
 import MemoryActionDropdownMenu from "../memory/memory-actions-popover";
 
 interface MemoryCardProps {
@@ -36,11 +32,10 @@ const MemoryCard: React.FC<MemoryCardProps> = (props) => {
   });
 
   const fadeInOutSpring = useSpring({
-    from: { opacity: 0, scale: 1, filter: "blur(40px)" },
+    from: { opacity: 0, scale: 1},
     to: {
       opacity: inView ? 1 : 0,
       scale: inView ? 1 : 1.1,
-      filter: "blur(20px)",
     },
     config: config.molasses,
   });
@@ -53,6 +48,7 @@ const MemoryCard: React.FC<MemoryCardProps> = (props) => {
           alt={"background image"}
           layout="fill"
           objectFit="cover"
+          className="blur-md"
         />
       </animated.div>
       <div
@@ -68,20 +64,21 @@ const MemoryCard: React.FC<MemoryCardProps> = (props) => {
         />
       </div>
       <div className="z-10 flex w-full flex-col bg-white">
-      <CardHeader className="w-full flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="truncate max-w-[360px]">{props.name}</CardTitle>
-        
-        {username === props.creator && (
-          <MemoryActionDropdownMenu
-            laneId={props.laneId}
-            creator={props.creator}
-            description={props.description ?? ""}
-            memoryId={props.id}
-            name={props.name}
-            timestamp={props.timestamp}
-          />
-        )}
-      </CardHeader>
+        <CardHeader className="flex w-full flex-row items-center justify-between space-y-0">
+          <CardTitle className="max-w-[360px] truncate">{props.name}</CardTitle>
+
+          {username === props.creator && (
+            <MemoryActionDropdownMenu
+              laneId={props.laneId}
+              creator={props.creator}
+              description={props.description ?? ""}
+              memoryId={props.id}
+              name={props.name}
+              timestamp={props.timestamp}
+              imageUrl={props.imageUrl}
+            />
+          )}
+        </CardHeader>
         <CardContent>
           {props?.description && (
             <CardDescription className="w-full max-w-[360px]">
@@ -89,7 +86,7 @@ const MemoryCard: React.FC<MemoryCardProps> = (props) => {
             </CardDescription>
           )}
           <h3 className="text-sm text-gray-500">
-            {format(new Date(props.timestamp), "MMM dd, yyyy")}
+            {format(toZonedTime(props.timestamp, "UTC"), "MMM dd, yyyy")}
           </h3>
         </CardContent>
         <CardFooter>

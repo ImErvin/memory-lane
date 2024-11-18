@@ -1,3 +1,4 @@
+import { upload } from "@vercel/blob/client";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -65,4 +66,28 @@ export const convertImageToWebP = (
     };
     reader.readAsDataURL(file);
   });
+};
+
+
+export const handleUploadImage = async (file: File) => {
+  try {
+    const optimizedBlob = await convertImageToWebP(file, 0.75);
+    const optimizedFile = new File(
+      [optimizedBlob],
+      `${file.name.split(".")[0]}.webp`,
+      { type: "image/webp" }
+    );
+
+    const newBlob = await upload(optimizedFile.name, optimizedFile, {
+      access: "public",
+      handleUploadUrl: "/api/memory/upload",
+    });
+
+    if (!newBlob) return;
+
+    return newBlob.url;
+  } catch (error) {
+    console.error(error);
+    toast.error("We couldn't upload the image. Please try again later.");
+  }
 };

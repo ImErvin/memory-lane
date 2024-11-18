@@ -7,6 +7,8 @@ import MemoriesFilter from "./memories-filter";
 const MemoriesGrid: React.FC = () => {
   const { memories, lane } = useMemoryLane();
 
+  console.log(memories);
+
   return (
     <>
       <div className="mx-auto flex w-full max-w-hd flex-col gap-20 px-4 pb-4 items-end lg:sticky top-16 z-50">
