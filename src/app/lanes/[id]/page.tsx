@@ -19,9 +19,17 @@ export default async function MemoryLanePage({ params }: Props) {
       throw err;
     });
 
+  const memories = await api.memories.getAllForLane({
+    laneId: Number(laneId ?? "-1"),
+  });
+
   return (
     <HydrateClient>
-      <MemoryLaneProvider initialLane={lane} laneId={Number(laneId ?? "-1")}>
+      <MemoryLaneProvider
+        initialLane={lane}
+        laneId={Number(laneId ?? "-1")}
+        initialMemories={memories}
+      >
         <MemoryLane />
       </MemoryLaneProvider>
     </HydrateClient>

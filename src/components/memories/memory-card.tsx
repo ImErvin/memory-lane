@@ -1,13 +1,9 @@
-import { useMemoryLane } from "@/contexts/use-memory-lane";
 import {
   animated,
   config,
   useInView,
-  useScroll,
   useSpring,
 } from "@react-spring/web";
-import { useEffect, useMemo } from "react";
-import { AspectRatio } from "../ui/aspect-ratio";
 import {
   Card,
   CardContent,
@@ -20,16 +16,21 @@ import Image from "next/image";
 import { format } from "date-fns/format";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import useUserStore from "@/stores/user-store";
+import MemoryActionDropdownMenu from "../memory/memory-actions-popover";
 
-interface MemoryViewProps {
+interface MemoryCardProps {
   id: number;
   name: string;
   description?: string | null;
-  timestamp: Date;
+  timestamp: string;
   imageUrl: string;
+  creator: string;
+  laneId: number;
 }
 
-const MemoryView: React.FC<MemoryViewProps> = (props) => {
+const MemoryCard: React.FC<MemoryCardProps> = (props) => {
+  const { username } = useUserStore();
   const [ref, inView] = useInView({
     amount: 0.5,
   });
@@ -66,10 +67,21 @@ const MemoryView: React.FC<MemoryViewProps> = (props) => {
           height={400}
         />
       </div>
-      <div className="z-10 flex w-full flex-col bg-white pr-4">
-        <CardHeader className="w-full max-w-[360px]">
-          <CardTitle className="text-xl lg:text-3xl">{props.name}</CardTitle>
-        </CardHeader>
+      <div className="z-10 flex w-full flex-col bg-white">
+      <CardHeader className="w-full flex flex-row items-center justify-between space-y-0">
+        <CardTitle className="truncate max-w-[360px]">{props.name}</CardTitle>
+        
+        {username === props.creator && (
+          <MemoryActionDropdownMenu
+            laneId={props.laneId}
+            creator={props.creator}
+            description={props.description ?? ""}
+            memoryId={props.id}
+            name={props.name}
+            timestamp={props.timestamp}
+          />
+        )}
+      </CardHeader>
         <CardContent>
           {props?.description && (
             <CardDescription className="w-full max-w-[360px]">
@@ -94,4 +106,4 @@ const MemoryView: React.FC<MemoryViewProps> = (props) => {
 
 const AnimatedImage = animated(Image);
 
-export default MemoryView;
+export default MemoryCard;

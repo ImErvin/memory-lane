@@ -8,7 +8,7 @@ import { Skeleton } from "../ui/skeleton";
 import { useSpring, config, animated } from "@react-spring/web";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
-import { CreateLaneFormDialog } from "../lanes/lane-form-dialog";
+import { CreateLaneFormDialog } from "../lane/lane-form-dialog";
 
 const ignoredColors = ["#ffffff", "#000000"];
 
@@ -139,8 +139,8 @@ const ProfileBanner: React.FC = () => {
           <CreateLaneFormDialog
             trigger={
               <Button size="sm" className="mt-0" variant={"outline"}>
+                <Plus />
                 <span className="hidden lg:block">New Memory Lane</span>
-                <Plus size={16} />
               </Button>
             }
             onSuccess={refetchLanes}

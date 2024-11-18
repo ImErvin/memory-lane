@@ -9,23 +9,22 @@ import {
 } from "@react-spring/web";
 import MemoryLanePlaque from "./memory-lane-plaque";
 import { Button } from "../ui/button";
-import { CreateMemoryFormDialog } from "../memories/memories-form-dialog";
+import { CreateMemoryFormDialog } from "../memory/memory-form-dialog";
 import MemoriesGrid from "../memories/memories-grid";
 import useUserStore from "@/stores/user-store";
-import { ScrollArea } from "../ui/scroll-area";
 
 const EmptyState = () => {
   const { username } = useUserStore();
   const { lane } = useMemoryLane();
 
   return (
-    <div className="!h-full bg-white p-6 mx-auto w-full max-w-hd">
+    <div className="mx-auto !h-full w-full max-w-hd bg-white p-6">
       {username === lane.creator && (
         <CreateMemoryFormDialog
           trigger={
             <Button
               variant="outline"
-              className="h-full w-full animate-pulse border-2 border-dashed"
+              className="h-[50vh] w-full animate-pulse border-2 border-dashed"
             >
               <span className="max-w-[200px] text-wrap">
                 Start by pressing here!
@@ -75,13 +74,11 @@ const MemoryLane: React.FC = () => {
       className="flex h-full min-h-screen w-full flex-col"
       style={fadeInSpring}
     >
-      <ScrollArea className="">
-        <div className="z-0 flex h-auto w-full pt-[calc(72px+8px+16px)]">
-          <MemoryLanePlaque />
-        </div>
-        {memories.length === 0 && <EmptyState />}
-        {memories.length !== 0 && <MemoriesGrid />}
-      </ScrollArea>
+      <div className="z-0 flex h-auto w-full pt-[calc(72px+8px+16px)]">
+        <MemoryLanePlaque />
+      </div>
+      {memories.length === 0 && <EmptyState />}
+      {memories.length !== 0 && <MemoriesGrid />}
     </animated.main>
   );
 };

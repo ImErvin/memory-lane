@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { AnimatedButton, Button } from "../ui/button";
+import { Button } from "../ui/button";
 import { ArrowRight } from "lucide-react";
 import {
   animated,
@@ -17,6 +17,9 @@ import {
   useSpring,
 } from "@react-spring/web";
 import Image from "next/image";
+import { Skeleton } from "../ui/skeleton";
+import useUserStore from "@/stores/user-store";
+import LaneActionDropdownMenu from "../lane/lane-actions-popover";
 
 interface LaneCardProps {
   id: number;
@@ -29,6 +32,7 @@ interface LaneCardProps {
 }
 
 const LaneCard: React.FC<LaneCardProps> = (props) => {
+  const { username } = useUserStore();
   const [fadeInSpring, fadeInSpringApi] = useSpring(() => ({
     from: { opacity: 0 },
     to: { opacity: 1 },
@@ -48,8 +52,8 @@ const LaneCard: React.FC<LaneCardProps> = (props) => {
   }, []);
 
   return (
-    <Card className="flex-shrink-0 overflow-hidden">
-      <CardHeader className="flex w-full max-w-full flex-row items-center justify-between border-b !px-4 !py-2">
+    <Card className="flex-shrink-0">
+      <CardHeader className="flex w-full max-w-full flex-row items-center justify-between space-y-0 border-b !px-4 !py-2">
         <CardTitle className="truncate">{props.name}</CardTitle>
         {props.isPublic && (
           <div>
@@ -64,11 +68,19 @@ const LaneCard: React.FC<LaneCardProps> = (props) => {
             </Link>
           </div>
         )}
+        {!props.isPublic && username === props.creator && (
+          <LaneActionDropdownMenu
+            laneId={props.id}
+            name={props.name}
+            description={props.description ?? ""}
+            creator={props.creator}
+          />
+        )}
       </CardHeader>
       {/* TODO: Fix this card content to be more responsive */}
       <AnimatedLink
         href={`/lanes/${props.id}`}
-        className="group flex w-full flex-col h-[200px]"
+        className="group flex h-[200px] w-full flex-col"
         style={fadeInSpring}
       >
         <CardContent className="grid w-full flex-shrink-0 grid-cols-3 gap-2 px-4 !pb-0 pt-4">
@@ -91,7 +103,7 @@ const LaneCard: React.FC<LaneCardProps> = (props) => {
                   src={props.images[i]}
                   alt="memory"
                   layout="fill"
-                  className="rounded-xl"
+                  className="rounded-xl object-cover"
                 />
               </div>
             );
@@ -110,4 +122,8 @@ const LaneCard: React.FC<LaneCardProps> = (props) => {
 };
 
 const AnimatedLink = animated(Link);
+
+export const SkeletonLaneCard: React.FC = () => {
+  return <Skeleton className="h-[250px] flex-shrink-0" />;
+};
 export default LaneCard;

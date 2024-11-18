@@ -10,6 +10,7 @@ import {
 import { type inferProcedureOutput } from "@trpc/server";
 import React from "react";
 import {
+  AnimatedCard,
   Card,
   CardContent,
   CardDescription,
@@ -21,6 +22,8 @@ import Image from "next/image";
 import { format } from "date-fns/format";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import MemoryActionDropdownMenu from "../memory/memory-actions-popover";
+import useUserStore from "@/stores/user-store";
 
 interface MemoryPageProps {
   memory: inferProcedureOutput<AppRouter["memories"]["getOne"]>;
@@ -29,6 +32,7 @@ interface MemoryPageProps {
 const AnimatedImage = animated(Image);
 
 const MemoryPage: React.FC<MemoryPageProps> = (props) => {
+  const { username } = useUserStore();
   const [ref, inView] = useInView({
     amount: 0.5,
   });
@@ -64,59 +68,70 @@ const MemoryPage: React.FC<MemoryPageProps> = (props) => {
   if (!props.memory) return null;
 
   return (
-    <animated.main
-      className="flex h-full min-h-screen w-full flex-col"
+    <AnimatedCard
       style={fadeInSpring}
+      className="relative flex h-full min-h-screen w-full flex-col items-center justify-center overflow-hidden rounded-3xl"
     >
-      <Card className="relative flex h-full flex-col items-center justify-center overflow-hidden rounded-3xl">
-        <animated.div className="absolute inset-0 z-0 h-full w-full flex-shrink-0 bg-cover bg-center">
-          <AnimatedImage
-            style={fadeInOutSpring}
-            src={props.memory.imageUrl}
-            alt={"background image"}
-            layout="fill"
-            objectFit="cover"
-          />
-        </animated.div>
-        <div
-          ref={ref}
-          className="relative z-10 flex h-full max-h-[95%] min-h-[300px] w-full max-w-full flex-shrink items-center justify-center border-b object-center p-4"
-        >
-          <Image
-            src={props.memory.imageUrl}
-            alt={props.memory.name}
-            className="rounded-xl object-contain object-center"
-            fill
-          />
+      <animated.div className="absolute inset-0 z-0 h-full w-full flex-shrink-0 bg-cover bg-center">
+        <AnimatedImage
+          style={fadeInOutSpring}
+          src={props.memory.imageUrl}
+          alt={"background image"}
+          layout="fill"
+          objectFit="cover"
+        />
+      </animated.div>
+      <div
+        ref={ref}
+        className="relative z-10 mt-auto flex h-full max-h-[95%] min-h-[300px] w-full max-w-full flex-shrink items-center justify-center object-center p-4"
+      >
+        <Image
+          src={props.memory.imageUrl}
+          alt={props.memory.name}
+          className="rounded-xl object-contain object-center"
+          width={1200}
+          height={1200}
+        />
+      </div>
+      <div className="z-10 mt-auto w-full flex-shrink-0 bg-white">
+        <div className="mx-auto flex w-full max-w-hd flex-col pr-4">
+          <CardHeader className="flex w-full flex-row items-center justify-between space-y-0">
+            <CardTitle className="max-w-[360px] truncate">
+              {props.memory.name}
+            </CardTitle>
+
+            {username === props.memory.lane.creator && (
+              <MemoryActionDropdownMenu
+                laneId={props.memory.laneId}
+                creator={props.memory.lane.creator}
+                description={props.memory.description ?? ""}
+                memoryId={props.memory.id}
+                name={props.memory.name}
+                timestamp={props.memory.timestamp.toISOString()}
+              />
+            )}
+          </CardHeader>
+          <CardContent>
+            {props.memory?.description && (
+              <CardDescription className="w-full max-w-[360px]">
+                {props.memory.description}
+              </CardDescription>
+            )}
+            <h3 className="text-sm text-gray-500">
+              {format(new Date(props.memory.timestamp), "MMM dd, yyyy")}
+            </h3>
+          </CardContent>
+          <CardFooter>
+            <Link href={`/lanes/${props.memory.laneId}`}>
+              <Button variant="default" size="sm">
+                See Lane
+              </Button>
+            </Link>
+          </CardFooter>
         </div>
-        <div className="z-10 w-full flex-shrink-0 bg-white">
-          <div className="mx-auto flex w-full max-w-hd flex-col pr-4">
-            <CardHeader className="w-full max-w-[360px]">
-              <CardTitle className="text-xl lg:text-3xl">
-                {props.memory.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {props.memory?.description && (
-                <CardDescription className="w-full max-w-[360px]">
-                  {props.memory.description}
-                </CardDescription>
-              )}
-              <h3 className="text-sm text-gray-500">
-                {format(new Date(props.memory.timestamp), "MMM dd, yyyy")}
-              </h3>
-            </CardContent>
-            <CardFooter>
-              <Link href={`/lanes/${props.memory.laneId}`}>
-                <Button variant="default" size="sm">
-                  See Lane
-                </Button>
-              </Link>
-            </CardFooter>
-          </div>
-        </div>
-      </Card>
-    </animated.main>
+      </div>
+    </AnimatedCard>
+    // </animated.main>
   );
 };
 

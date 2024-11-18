@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { DbConnectionError } from "../exceptions";
+import { del } from "@vercel/blob";
 
 const memoryInputSchema = z.object({
   name: z.string(),
@@ -110,6 +111,8 @@ export const memoriesRouter = createTRPCRouter({
         });
       }
 
+      await del([existingMemory.imageUrl]);
+
       const updatedMemory = await ctx.db.memory.update({
         where: { id: input.id },
         data: {
@@ -156,6 +159,8 @@ export const memoriesRouter = createTRPCRouter({
       const memory = await ctx.db.memory.delete({
         where: { id: input.id },
       });
+
+      await del([existingMemory.imageUrl]);
 
       return memory;
     }),

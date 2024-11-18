@@ -7,7 +7,7 @@ import React from "react";
 
 const NotFoundPage: React.FC = () => {
   return (
-    <div className="mx-auto flex h-full w-full flex-col items-center justify-center gap-3 bg-red-500 text-white">
+    <div className="mx-auto flex h-screen w-full flex-col items-center justify-center gap-3 bg-red-500 text-white">
       <h1 className="font-magilio text-4xl">Page Not Found</h1>
       <p className="max-w-[300px] text-center text-2xl">
         Sorry, the page you are looking for does not exist.

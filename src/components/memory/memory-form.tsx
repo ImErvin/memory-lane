@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useRef } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -23,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { Textarea } from "../ui/textarea";
 import { convertImageToWebP } from "@/lib/utils";
 
-const MAX_FILE_SIZE = 3000000;
+const MAX_FILE_SIZE = 10000000;
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -46,7 +45,7 @@ const formSchema = z.object({
     .refine((files: File[]) => files?.length == 1, "A picture is required.")
     .refine(
       (files: File[]) => files[0] && files[0].size <= MAX_FILE_SIZE,
-      `File size should be less than 3mb.`,
+      `File size should be less than ${MAX_FILE_SIZE / 1000000}MB.`,
     )
     .refine(
       (files: File[]) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type ?? ""),
@@ -61,53 +60,54 @@ interface MemoryFormProps {
   description?: string | null;
   timestamp?: string;
   id?: number;
+  imageUrl?: string;
 }
 
 const MemoryForm: React.FC<MemoryFormProps> = (props) => {
   const { username } = useUserStore();
   const router = useRouter();
-  const [isUploadingFile, setIsUploadingFile] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const { mutate: createMemory } = api.memories.createOne.useMutation({
-    onSuccess: (data) => {
-      toast.success("Memory created successfully", {
-        action: {
-          label: "View",
-          onClick: () => {
-            router.push(`/memories/${data.id}`);
+  const { mutate: createMemory, isPending } =
+    api.memories.createOne.useMutation({
+      onSuccess: (data) => {
+        toast.success("Memory created successfully", {
+          action: {
+            label: "View",
+            onClick: () => {
+              router.push(`/memories/${data.id}`);
+            },
           },
-        },
-      });
-      props.onSuccess();
-    },
-    onError: (error) => {
-      toast.error(
-        error.message ||
-          "We couldn't create the memory. Please try again later.",
-      );
-    },
-  });
+        });
+        props.onSuccess();
+      },
+      onError: (error) => {
+        toast.error(
+          error.message ||
+            "We couldn't create the memory. Please try again later.",
+        );
+      },
+    });
 
-  const { mutate: updateMemory } = api.memories.updateOne.useMutation({
-    onSuccess: (data) => {
-      toast.success("Memory updated successfully", {
-        action: {
-          label: "View",
-          onClick: () => {
-            router.push(`/memories/${data.id}`);
+  const { mutate: updateMemory, isPending: isUpdatePending } =
+    api.memories.updateOne.useMutation({
+      onSuccess: (data) => {
+        toast.success("Memory updated successfully", {
+          action: {
+            label: "View",
+            onClick: () => {
+              router.push(`/memories/${data.id}`);
+            },
           },
-        },
-      });
-      props.onSuccess();
-    },
-    onError: (error) => {
-      toast.error(
-        error.message ||
-          "We couldn't update the memory. Please try again later.",
-      );
-    },
-  });
+        });
+        props.onSuccess();
+      },
+      onError: (error) => {
+        toast.error(
+          error.message ||
+            "We couldn't update the memory. Please try again later.",
+        );
+      },
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -122,8 +122,6 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
   const imageRef = form.register("image", { required: true });
 
   const handleUploadImage = async (file: File) => {
-    setIsUploadingFile(true);
-
     try {
       // Trying to add some sort of image optimization on client side
       // this uses a canvas to resize the image and convert it to webp with a lower quality
@@ -149,8 +147,6 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
     } catch (error) {
       console.error(error);
       toast.error("We couldn't upload the image. Please try again later.");
-    } finally {
-      setIsUploadingFile(false);
     }
   };
 
@@ -227,7 +223,7 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
           name="timestamp"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Timestamp</FormLabel>
+              <FormLabel>When did this memory happen?</FormLabel>
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
@@ -242,20 +238,24 @@ const MemoryForm: React.FC<MemoryFormProps> = (props) => {
             <FormItem>
               <FormLabel>Picture</FormLabel>
               <FormControl>
-                <div className="flex flex-col gap-2">
-                  <Input
-                    type="file"
-                    accept={ACCEPTED_IMAGE_TYPES.join(",")}
-                    {...imageRef}
-                  />
-                </div>
+                <Input
+                  type="file"
+                  accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                  {...imageRef}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="ml-auto">
+        <Button
+          type="submit"
+          className="ml-auto"
+          isLoading={
+            form.formState.isSubmitting || isUpdatePending || isPending
+          }
+        >
           Save changes
         </Button>
       </form>

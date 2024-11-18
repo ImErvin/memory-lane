@@ -154,6 +154,10 @@ export const lanesRouter = createTRPCRouter({
       return deletedLane;
     }),
 
+  // This sort of rpc seems weird to me but I wasn't sure on the best
+  // way to achieve it - this seems simple enough and works but should it be
+  // more like a query where each prisma property is an input?
+  // Basically moving the logic to the client side to filter the lanes?
   get10: publicProcedure.query(async ({ ctx }) => {
     if (!ctx.db.lane) throw new DbConnectionError();
 

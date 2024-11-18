@@ -2,11 +2,24 @@
 
 import { api } from "@/trpc/react";
 import { Button } from "../ui/button";
-import { CreateLaneFormDialog } from "../lanes/lane-form-dialog";
-import LaneCard from "../lanes/lane-card";
+import { CreateLaneFormDialog } from "../lane/lane-form-dialog";
+import LaneCard, { SkeletonLaneCard } from "../lanes/lane-card";
+import { useId } from "react";
+
+const LoadingState: React.FC = () => {
+  const id = useId();
+
+  return (
+    <div className="grid h-full w-full max-w-full grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+      {new Array(5).fill(0).map((_, i) => (
+        <SkeletonLaneCard key={`${id}-${i}`} />
+      ))}
+    </div>
+  );
+};
 
 const Landing: React.FC = () => {
-  const { data: lanes, refetch } = api.lanes.get10.useQuery();
+  const { data: lanes, refetch, isLoading } = api.lanes.get10.useQuery();
 
   return (
     <div className="flex max-w-full flex-col gap-10 pt-10">
@@ -37,20 +50,23 @@ const Landing: React.FC = () => {
           </p>
         </div>
       </div>
-      <div className="grid w-full max-w-full grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
-        {lanes?.map((lane) => (
-          <LaneCard
-            key={lane.id}
-            id={lane.id}
-            name={lane.name}
-            description={lane.description ?? ""}
-            creator={lane.creator}
-            memoryCount={lane._count.memories}
-            images={lane.memories.map((memory) => memory.imageUrl)}
-            isPublic
-          />
-        ))}
-      </div>
+      {!isLoading && (
+        <div className="grid w-full max-w-full grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          {lanes?.map((lane) => (
+            <LaneCard
+              key={lane.id}
+              id={lane.id}
+              name={lane.name}
+              description={lane.description ?? ""}
+              creator={lane.creator}
+              memoryCount={lane._count.memories}
+              images={lane.memories.map((memory) => memory.imageUrl)}
+              isPublic
+            />
+          ))}
+        </div>
+      )}
+      {isLoading && <LoadingState />}
     </div>
   );
 };

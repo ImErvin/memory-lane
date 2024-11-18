@@ -1,15 +1,13 @@
 "use client";
 
-import { type appRouter } from "@/server/api/root";
+import { type AppRouter } from "@/server/api/root";
 import { api } from "@/trpc/react";
 import { type inferProcedureOutput } from "@trpc/server";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext } from "react";
 
 interface MemoryLaneContextProps {
-  lane: inferProcedureOutput<(typeof appRouter)["lanes"]["getOne"]>;
-  memories: inferProcedureOutput<
-    (typeof appRouter)["memories"]["getAllForLane"]
-  >;
+  lane: inferProcedureOutput<AppRouter["lanes"]["getOne"]>;
+  memories: inferProcedureOutput<AppRouter["memories"]["getAllForLane"]>;
   isInitialFetchingLane: boolean;
   isInitialFetchingMemories: boolean;
   isRevalidatingLane: boolean;
@@ -26,13 +24,15 @@ const MemoryLaneContext = createContext<MemoryLaneContextProps | undefined>(
 
 interface MemoryLaneProviderProps {
   laneId: number;
-  initialLane: inferProcedureOutput<(typeof appRouter)["lanes"]["getOne"]>;
+  initialLane: inferProcedureOutput<AppRouter["lanes"]["getOne"]>;
+  initialMemories: inferProcedureOutput<AppRouter["memories"]["getAllForLane"]>;
   children: React.ReactNode;
 }
 
 export const MemoryLaneProvider: React.FC<MemoryLaneProviderProps> = ({
   laneId,
   initialLane,
+  initialMemories,
   children,
 }) => {
   const {
@@ -53,7 +53,13 @@ export const MemoryLaneProvider: React.FC<MemoryLaneProviderProps> = ({
     isFetching: isMemoriesFetching,
     isLoading: isMemoriesLoading,
     refetch: refetchMemories,
-  } = api.memories.getAllForLane.useQuery({ laneId });
+  } = api.memories.getAllForLane.useQuery(
+    { laneId },
+    {
+      initialData: initialMemories,
+      enabled: !!initialMemories,
+    },
+  );
 
   return (
     <MemoryLaneContext.Provider

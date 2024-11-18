@@ -6,13 +6,13 @@ import { useMemoryLane } from "@/contexts/use-memory-lane";
 import useUserStore from "@/stores/user-store";
 import { Menubar } from "../ui/menubar";
 import { Card } from "../ui/card";
-import { Pencil } from "lucide-react";
+import { Edit, Pencil, Plus, Trash2 } from "lucide-react";
 import {
   DeleteLaneDialog,
   UpdateLaneFormDialog,
-} from "../lanes/lane-form-dialog";
+} from "./lane-form-dialog";
 import { useRouter } from "next/navigation";
-import { CreateMemoryFormDialog } from "../memories/memories-form-dialog";
+import { CreateMemoryFormDialog } from "../memory/memory-form-dialog";
 
 const MemoryLanePlaque = () => {
   const { lane, refetchLane, refetchMemories } = useMemoryLane();
@@ -45,6 +45,7 @@ const MemoryLanePlaque = () => {
             <CreateMemoryFormDialog
               trigger={
                 <Button variant={"outline"} size={"sm"} className="mr-auto">
+                  <Plus />
                   Add Memory
                 </Button>
               }
@@ -58,6 +59,7 @@ const MemoryLanePlaque = () => {
             <UpdateLaneFormDialog
               trigger={
                 <Button variant={"outline"} size={"sm"}>
+                  <Edit />
                   Edit
                 </Button>
               }
@@ -70,6 +72,7 @@ const MemoryLanePlaque = () => {
             <DeleteLaneDialog
               trigger={
                 <Button variant={"destructive"} size={"sm"}>
+                  <Trash2 />
                   Delete
                 </Button>
               }

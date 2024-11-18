@@ -17,6 +17,7 @@ import MemoryForm from "./memory-form";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import LoginForm from "../login/login-form";
+import { useRouter } from "next/navigation";
 
 interface MemoryFormDialogProps {
   trigger?: React.ReactNode;
@@ -27,6 +28,7 @@ interface MemoryFormDialogProps {
 const CreateMemoryFormDialog: React.FC<MemoryFormDialogProps> = (props) => {
   const { username } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
+  const utils = api.useUtils();
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -51,6 +53,9 @@ const CreateMemoryFormDialog: React.FC<MemoryFormDialogProps> = (props) => {
               laneId={props.laneId}
               onSuccess={() => {
                 setIsOpen(false);
+                void utils.memories.getAllForLane.invalidate({
+                  laneId: props.laneId,
+                });
                 props.onSuccess?.();
               }}
             />
@@ -76,6 +81,7 @@ const UpdateMemoryFormDialog: React.FC<UpdateMemoryFormDialogProps> = (
 ) => {
   const { username } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
+  const utils = api.useUtils();
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -102,6 +108,12 @@ const UpdateMemoryFormDialog: React.FC<UpdateMemoryFormDialogProps> = (
               timestamp={props.timestamp}
               onSuccess={() => {
                 setIsOpen(false);
+                void utils.memories.getAllForLane.invalidate({
+                  laneId: props.laneId,
+                });
+                void utils.memories.getOne.invalidate({
+                  id: props.memoryId,
+                });
                 props.onSuccess?.();
               }}
             />
@@ -121,17 +133,23 @@ interface DeleteMemoryDialogProps {
 const DeleteMemoryDialog: React.FC<DeleteMemoryDialogProps> = (props) => {
   const { username } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
-  const { mutate: deleteMemory } = api.memories.deleteOne.useMutation({
-    onSuccess: () => {
-      toast.success("Memory deleted successfully");
-      props.onSuccess();
-      setIsOpen(false);
-    },
-    onError: (error) => {
-      toast.error(error.message || "We couldn't delete the memory. Please try again later.");
-    },
-  });
+  const { mutate: deleteMemory, isPending } =
+    api.memories.deleteOne.useMutation({
+      onSuccess: async (data) => {
+        toast.success("Memory deleted successfully");
+        props.onSuccess();
+        router.push(`/lanes/${data.laneId}`);
+        setIsOpen(false);
+      },
+      onError: (error) => {
+        toast.error(
+          error.message ||
+            "We couldn't delete the memory. Please try again later.",
+        );
+      },
+    });
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -162,6 +180,7 @@ const DeleteMemoryDialog: React.FC<DeleteMemoryDialogProps> = (props) => {
                     creator: username,
                   });
                 }}
+                isLoading={isPending}
               >
                 Delete
               </Button>

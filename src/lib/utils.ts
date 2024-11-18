@@ -23,7 +23,6 @@ export const convertImageToWebP = (
           return;
         }
 
-        // Calculate the new dimensions while maintaining the aspect ratio
         let { width, height } = img;
         if (width > maxWidth || height > maxHeight) {
           if (width > height) {
@@ -42,7 +41,6 @@ export const convertImageToWebP = (
         canvas.toBlob(
           (blob) => {
             if (blob) {
-              // Create a new File from the Blob
               const webpFile = new File(
                 [blob],
                 `${file.name.split(".")[0]}.webp`,
@@ -57,7 +55,7 @@ export const convertImageToWebP = (
             }
           },
           "image/webp",
-          quality, // Use lower quality for more aggressive compression (e.g., 0.6 or lower)
+          quality,
         );
       };
       img.src = event.target?.result as string;

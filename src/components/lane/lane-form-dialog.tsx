@@ -112,13 +112,22 @@ interface DeleteLaneDialogProps {
 const DeleteLaneDialog: React.FC<DeleteLaneDialogProps> = (props) => {
   const { username } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
+  const utils = api.useUtils();
+  const [isInvalidating, setIsInvalidating] = useState(false);
 
-  const { mutate: deleteLane } = api.lanes.deleteOne.useMutation({
-    onSuccess: () => {
+  const { mutate: deleteLane, isPending } = api.lanes.deleteOne.useMutation({
+    onSuccess: async () => {
       toast.success("Memory lane deleted successfully");
-      props.onSuccess();
+
+      setIsInvalidating(true);
+      await utils.lanes.get10.invalidate();
+      await utils.lanes.getAllForUsername.invalidate({
+        creator: username!,
+      });
+      setIsInvalidating(false);
 
       setIsOpen(false);
+
       props.onSuccess();
     },
     onError: (error) => {
@@ -159,6 +168,7 @@ const DeleteLaneDialog: React.FC<DeleteLaneDialogProps> = (props) => {
                     creator: username,
                   });
                 }}
+                isLoading={isPending || isInvalidating}
               >
                 Delete
               </Button>
