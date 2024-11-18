@@ -19,7 +19,7 @@ const EmptyState = () => {
   const { lane } = useMemoryLane();
 
   return (
-    <div className="h-full bg-white p-6">
+    <div className="!h-full bg-white p-6 mx-auto w-full max-w-hd">
       {username === lane.creator && (
         <CreateMemoryFormDialog
           trigger={
@@ -75,7 +75,7 @@ const MemoryLane: React.FC = () => {
       className="flex h-full min-h-screen w-full flex-col"
       style={fadeInSpring}
     >
-      <ScrollArea>
+      <ScrollArea className="">
         <div className="z-0 flex h-auto w-full pt-[calc(72px+8px+16px)]">
           <MemoryLanePlaque />
         </div>

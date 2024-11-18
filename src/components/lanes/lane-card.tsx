@@ -8,13 +8,15 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { AnimatedButton } from "../ui/button";
+import { AnimatedButton, Button } from "../ui/button";
 import { ArrowRight } from "lucide-react";
 import {
+  animated,
   config,
   useIsomorphicLayoutEffect,
   useSpring,
 } from "@react-spring/web";
+import Image from "next/image";
 
 interface LaneCardProps {
   id: number;
@@ -22,6 +24,8 @@ interface LaneCardProps {
   description?: string;
   creator: string;
   memoryCount?: number;
+  isPublic?: boolean;
+  images: string[];
 }
 
 const LaneCard: React.FC<LaneCardProps> = (props) => {
@@ -44,41 +48,66 @@ const LaneCard: React.FC<LaneCardProps> = (props) => {
   }, []);
 
   return (
-    <Card className="h-[200px] flex-shrink-0">
-      <CardHeader className="w-full max-w-full border-b !p-4">
+    <Card className="flex-shrink-0 overflow-hidden">
+      <CardHeader className="flex w-full max-w-full flex-row items-center justify-between border-b !px-4 !py-2">
         <CardTitle className="truncate">{props.name}</CardTitle>
+        {props.isPublic && (
+          <div>
+            <Link href={`/users/${props.creator}`}>
+              <Button
+                variant={"link"}
+                size="sm"
+                className="text-xs text-muted-foreground"
+              >
+                {props.creator}
+              </Button>
+            </Link>
+          </div>
+        )}
       </CardHeader>
-      <Link
+      {/* TODO: Fix this card content to be more responsive */}
+      <AnimatedLink
         href={`/lanes/${props.id}`}
-        className="group flex h-full w-full flex-col"
+        className="group flex w-full flex-col h-[200px]"
+        style={fadeInSpring}
       >
-        <AnimatedButton
-          className="flex h-[calc(100%-49px)] w-full flex-col items-start rounded-b-xl rounded-t-none border-none p-0 text-start"
-          variant={"outline"}
-          style={fadeInSpring}
-        >
-          <CardContent className="grid w-full flex-shrink-0 grid-cols-3 gap-2 px-4 !pb-0 pt-4">
-            {new Array(3).fill(0).map((_, i) => {
-              if ((props.memoryCount ?? 0) < i + 1) return null;
-
+        <CardContent className="grid w-full flex-shrink-0 grid-cols-3 gap-2 px-4 !pb-0 pt-4">
+          {new Array(3).fill(0).map((_, i) => {
+            if (!props?.images?.[i]) {
               return (
-                <img
-                  key={i}
-                  src={`https://picsum.photos/200/${300 + props.id + i}`}
-                  className="h-full max-h-20 w-full bg-gray-200 object-cover"
+                <div
+                  key={`${props.id}-${i}`}
+                  className="aspect-square h-full w-full rounded-xl bg-gray-200"
                 />
               );
-            })}
-          </CardContent>
-          <CardFooter className="mt-auto flex w-full items-center justify-between !px-4 pb-4">
-            <p className="text-xs text-muted-foreground">
-              {props?.memoryCount ?? 0} Memorie{props?.memoryCount !== 1 && "s"}
-            </p>
-            <ArrowRight className="text-muted-foreground opacity-0 transition-transform group-hover:translate-x-1 group-hover:text-primary group-hover:opacity-100" />
-          </CardFooter>
-        </AnimatedButton>
-      </Link>
+            }
+
+            return (
+              <div
+                key={props.images[i]}
+                className="relative aspect-square h-auto w-full"
+              >
+                <Image
+                  src={props.images[i]}
+                  alt="memory"
+                  layout="fill"
+                  className="rounded-xl"
+                />
+              </div>
+            );
+          })}
+        </CardContent>
+        <CardFooter className="mt-auto flex w-full items-center justify-between !px-4 pb-4">
+          <p className="text-xs text-muted-foreground">
+            {props?.memoryCount ?? 0} Memor
+            {props?.memoryCount !== 1 ? "ies" : "y"}
+          </p>
+          <ArrowRight className="text-muted-foreground opacity-0 transition-transform group-hover:translate-x-1 group-hover:text-primary group-hover:opacity-100" />
+        </CardFooter>
+      </AnimatedLink>
     </Card>
   );
 };
+
+const AnimatedLink = animated(Link);
 export default LaneCard;

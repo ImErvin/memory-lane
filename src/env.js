@@ -29,6 +29,7 @@ export const env = createEnv({
     POSTGRES_DATABASE: z.string(),
     POSTGRES_URL_NO_SSL: z.string().url(),
     POSTGRES_PRISMA_URL: z.string().url(),
+    BLOB_READ_WRITE_TOKEN: z.string()
   },
 
   /**
@@ -57,6 +58,7 @@ export const env = createEnv({
     POSTGRES_DATABASE: process.env.POSTGRES_DATABASE,
     POSTGRES_URL_NO_SSL: process.env.POSTGRES_URL_NO_SSL,
     POSTGRES_PRISMA_URL: process.env.POSTGRES_PRISMA_URL,
+    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
