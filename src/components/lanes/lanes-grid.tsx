@@ -23,6 +23,7 @@ const LanesGrid: React.FC = () => {
               description={lane.description ?? ""}
               creator={lane.creator}
               memoryCount={lane._count.memories}
+              images={lane.memories.map((memory) => memory.imageUrl)}
             />
           ))}
         </div>

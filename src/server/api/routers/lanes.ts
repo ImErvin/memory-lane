@@ -69,6 +69,11 @@ export const lanesRouter = createTRPCRouter({
               memories: true,
             },
           },
+          memories: {
+            select: {
+              imageUrl: true,
+            },
+          },
         },
       });
 
@@ -159,14 +164,19 @@ export const lanesRouter = createTRPCRouter({
             memories: true,
           },
         },
+        memories: {
+          select: {
+            imageUrl: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
       where: {
         memories: {
-          some: {}
-        }
+          some: {},
+        },
       },
       take: 10,
     });

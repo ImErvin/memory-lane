@@ -7,8 +7,9 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface MemoryLaneContextProps {
   lane: inferProcedureOutput<(typeof appRouter)["lanes"]["getOne"]>;
-  memories:
-    | inferProcedureOutput<(typeof appRouter)["memories"]["getAllForLane"]>;
+  memories: inferProcedureOutput<
+    (typeof appRouter)["memories"]["getAllForLane"]
+  >;
   isInitialFetchingLane: boolean;
   isInitialFetchingMemories: boolean;
   isRevalidatingLane: boolean;
@@ -39,9 +40,13 @@ export const MemoryLaneProvider: React.FC<MemoryLaneProviderProps> = ({
     isFetching,
     isLoading,
     refetch: refetchLane,
-  } = api.lanes.getOne.useQuery({ id: laneId }, {
-    initialData: initialLane,
-  });
+  } = api.lanes.getOne.useQuery(
+    { id: laneId },
+    {
+      initialData: initialLane,
+      enabled: !!initialLane,
+    },
+  );
 
   const {
     data: memories = [],

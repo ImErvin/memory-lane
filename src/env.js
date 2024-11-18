@@ -10,18 +10,26 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+
+    DATABASE_URL: z.string().url(),
+
+    DATABASE_URL_UNPOOLED: z.string().url(),
+
+    PGHOST: z.string(),
+    PGHOST_UNPOOLED: z.string(),
+    PGUSER: z.string(),
+    PGDATABASE: z.string(),
+    PGPASSWORD: z.string(),
+
     POSTGRES_URL: z.string().url(),
-    POSTGRES_PRISMA_URL: z.string().url(),
-    SUPABASE_URL: z.string().url(),
     POSTGRES_URL_NON_POOLING: z.string().url(),
-    SUPABASE_JWT_SECRET: z.string(),
     POSTGRES_USER: z.string(),
+    POSTGRES_HOST: z.string(),
     POSTGRES_PASSWORD: z.string(),
     POSTGRES_DATABASE: z.string(),
-    SUPABASE_SERVICE_ROLE_KEY: z.string(),
-    POSTGRES_HOST: z.string(),
-    SUPABASE_ANON_KEY: z.string(),
-    BLOB_READ_WRITE_TOKEN: z.string(),
+    POSTGRES_URL_NO_SSL: z.string().url(),
+    POSTGRES_PRISMA_URL: z.string().url(),
+    BLOB_READ_WRITE_TOKEN: z.string()
   },
 
   /**
@@ -31,26 +39,26 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
-    NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
   },
 
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    DATABASE_URL: process.env.DATABASE_URL,
+    DATABASE_URL_UNPOOLED: process.env.DATABASE_URL_UNPOOLED,
+    PGHOST: process.env.PGHOST,
+    PGHOST_UNPOOLED: process.env.PGHOST_UNPOOLED,
+    PGUSER: process.env.PGUSER,
+    PGDATABASE: process.env.PGDATABASE,
+    PGPASSWORD: process.env.PGPASSWORD,
     POSTGRES_URL: process.env.POSTGRES_URL,
-    POSTGRES_PRISMA_URL: process.env.POSTGRES_PRISMA_URL,
-    SUPABASE_URL: process.env.SUPABASE_URL,
     POSTGRES_URL_NON_POOLING: process.env.POSTGRES_URL_NON_POOLING,
-    SUPABASE_JWT_SECRET: process.env.SUPABASE_JWT_SECRET,
     POSTGRES_USER: process.env.POSTGRES_USER,
+    POSTGRES_HOST: process.env.POSTGRES_HOST,
     POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
     POSTGRES_DATABASE: process.env.POSTGRES_DATABASE,
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    POSTGRES_HOST: process.env.POSTGRES_HOST,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
+    POSTGRES_URL_NO_SSL: process.env.POSTGRES_URL_NO_SSL,
+    POSTGRES_PRISMA_URL: process.env.POSTGRES_PRISMA_URL,
+    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
@@ -59,7 +67,7 @@ export const env = createEnv({
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   /**
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
-   * `SOME_VAR=''` will throw an error.
+   * `SOME_VAR:
    */
   emptyStringAsUndefined: true,
 });
