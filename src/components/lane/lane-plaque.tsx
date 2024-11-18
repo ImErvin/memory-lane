@@ -20,7 +20,7 @@ const MemoryLanePlaque = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-hd flex-col items-start px-4 pb-10">
-      <div className="flex max-w-[360px] flex-col gap-2 pb-2 md:max-w-[500px]">
+      <div className="flex max-w-[360px] w-full flex-col gap-2 pb-2 md:max-w-[500px]">
         <h1 className="font-magilio text-5xl font-bold">{lane.name}</h1>
         <p className="break-words font-medium text-primary">
           {lane?.description}
