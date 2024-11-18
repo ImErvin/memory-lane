@@ -51,7 +51,8 @@ Basic image optimization is implemented using a canvas element to convert images
 
 For deployment, I used **Neon** as the database and **Vercel Blob Storage** for image hosting. Having exhausted my free GCP credits, I opted for an all-Vercel setup, which has performed well so far.
 
-Product Future Improvements
+### Product Future Improvements
+
 The app could greatly benefit from a comprehensive redesign to establish a stronger visual identity. Due to time constraints, I wasn't able to create design concepts in Figma, so the current UI was developed through trial and error to find what worked best.
 
 Currently, any user can edit another user's memories or lanes, as the only requirement for signing in is providing a username. Enhancing user authentication and access control would be a logical next step to improve security and user experience.
@@ -67,6 +68,8 @@ Additional features such as enabling users to like a memory or lane, and showcas
 After deploying the application and receiving feedback from friends during user testing, the following potential improvements were noted:
 
 1. The process of creating a memory lane and subsequently adding memories feels overly complex and should be simplified. A possible enhancement could be implementing an onboarding flow that allows users to create a lane and immediately add memories to it.
+
+    > I later added ExifData package to automatically attempt to find the date the image was taken and autofill the timestamp hopefully improving the UX slightly
 2. Users expressed a desire to use the app similarly to Instagram, wanting to create picture collections akin to albums without placing much importance on adding timestamps.
 3. Users raised concerns about all memory lanes being public by default. They wanted the ability to keep some lanes private.
 
