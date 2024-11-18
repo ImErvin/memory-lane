@@ -11,7 +11,6 @@ import { type inferProcedureOutput } from "@trpc/server";
 import React from "react";
 import {
   AnimatedCard,
-  Card,
   CardContent,
   CardDescription,
   CardFooter,

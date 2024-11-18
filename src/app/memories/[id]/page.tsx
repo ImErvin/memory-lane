@@ -1,6 +1,4 @@
-import MemoryLane from "@/components/lane/memory-lane-view";
 import MemoryPage from "@/components/memories/memory-page";
-import { MemoryLaneProvider } from "@/contexts/use-memory-lane";
 import { api, HydrateClient } from "@/trpc/server";
 import { type TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";

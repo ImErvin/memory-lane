@@ -2,7 +2,6 @@
 import { type AppRouter } from "@/server/api/root";
 import useUserStore from "@/stores/user-store";
 import { api } from "@/trpc/react";
-import { type RefetchOptions } from "@tanstack/react-query";
 import { type inferProcedureOutput } from "@trpc/server";
 import React, { createContext, useContext } from "react";
 

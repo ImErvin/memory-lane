@@ -10,27 +10,26 @@ export async function POST(request: Request): Promise<NextResponse> {
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (
-        pathname,
+      onBeforeGenerateToken: async () =>
         /* clientPayload */
-      ) => {
-        // Generate a client token for the browser to upload the file
-        // ⚠️ Authenticate and authorize users before generating the token.
-        // Otherwise, you're allowing anonymous uploads.
+        {
+          // Generate a client token for the browser to upload the file
+          // ⚠️ Authenticate and authorize users before generating the token.
+          // Otherwise, you're allowing anonymous uploads.
 
-        return {
-          allowedContentTypes: [
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/webp",
-          ],
-          tokenPayload: JSON.stringify({
-            // optional, sent to your server on upload completion
-            // you could pass a user id from auth, or a value from clientPayload
-          }),
-        };
-      },
+          return {
+            allowedContentTypes: [
+              "image/jpeg",
+              "image/jpg",
+              "image/png",
+              "image/webp",
+            ],
+            tokenPayload: JSON.stringify({
+              // optional, sent to your server on upload completion
+              // you could pass a user id from auth, or a value from clientPayload
+            }),
+          };
+        },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
         // Get notified of client upload completion
         // ⚠️ This will not work on `localhost` websites,
@@ -42,7 +41,8 @@ export async function POST(request: Request): Promise<NextResponse> {
           // Run any logic after the file upload completed
           // const { userId } = JSON.parse(tokenPayload);
           // await db.update({ avatar: blob.url, userId });
-        } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- ignored error
+        } catch (_) {
           throw new Error("Could not update user");
         }
       },
